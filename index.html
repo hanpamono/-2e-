@@ -45,17 +45,13 @@
             arrowRight: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>`,
             edit: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`,
             grip: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400 cursor-move"><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>`,
-            // ★追加: 売却アイコン
             coin: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="8"></line></svg>`
         };
 
         // === アプリケーションの状態管理 ===
         let state = {
             characters: [],
-            // ★追加: 共有財産
-            sharedAssets: {
-                money: 0
-            },
+            sharedAssets: { money: 0 },
             selectedCharacterId: null,
             logs: [],
             sort: { key: 'name', order: 'asc' },
@@ -70,7 +66,6 @@
             editCharacterForm: { maxWeight: 0 },
             editingItemId: null,
             draggingCharacterId: null,
-            // ★追加: 共有財産編集用の状態
             editingSharedMoney: false,
         };
 
@@ -80,7 +75,7 @@
         function updateFirebase() {
             const dataToSave = {
                 characters: state.characters,
-                sharedAssets: state.sharedAssets, // ★追加
+                sharedAssets: state.sharedAssets,
                 selectedCharacterId: state.selectedCharacterId,
                 logs: state.logs,
             };
@@ -92,12 +87,12 @@
                 const data = snapshot.val();
                 if (data) {
                     state.characters = data.characters || [];
-                    state.sharedAssets = data.sharedAssets || { money: 0 }; // ★追加
+                    state.sharedAssets = data.sharedAssets || { money: 0 };
                     state.selectedCharacterId = data.selectedCharacterId || null;
                     state.logs = data.logs || [];
                 } else {
                     state.characters = [];
-                    state.sharedAssets = { money: 0 }; // ★追加
+                    state.sharedAssets = { money: 0 };
                     state.selectedCharacterId = null;
                     state.logs = [];
                 }
@@ -105,62 +100,193 @@
             });
         }
 
-        // === ヘルパー関数 (変更なし) ===
-        // ...
+        // === ヘルパー関数 ===
+        const addLog = (message) => {
+            const timestamp = new Date().toLocaleString('ja-JP');
+            const newLog = { id: Date.now(), timestamp, message };
+            if (!state.logs) state.logs = [];
+            state.logs.unshift(newLog);
+        };
+        
+        const calculateCurrentWeight = (character) => {
+            if (!character || !character.items) return 0;
+            let totalWeight = 0;
+            const nonFoodItems = character.items.filter(item => item.type !== '食料');
+            const foodItems = character.items.filter(item => item.type === '食料');
+            let heaviestWeapon = null;
+            if (character.hasWeaponCase) {
+                heaviestWeapon = nonFoodItems.filter(item => item.type === '武器').sort((a, b) => b.weight - a.weight)[0];
+            }
+            nonFoodItems.forEach(item => {
+                let itemWeight = item.weight * item.quantity;
+                if (character.hasPotionHolder && item.type === 'ポーション' && item.weight === 1) {
+                    itemWeight = (item.quantity - Math.min(item.quantity, 5)) * item.weight;
+                } else if (character.hasToolPouch && item.type === '道具' && item.weight === 1) {
+                    itemWeight = (item.quantity - Math.min(item.quantity, 5)) * item.weight;
+                } else if (character.hasQuiver && item.type === '矢弾' && item.weight === 1) {
+                    itemWeight = (item.quantity - Math.min(item.quantity, 5)) * item.weight;
+                } else if (heaviestWeapon && item.id === heaviestWeapon.id) {
+                    itemWeight = Math.max(0, item.quantity - 1) * item.weight;
+                }
+                totalWeight += itemWeight;
+            });
+            if (!character.hasLunchBox) {
+                foodItems.forEach(item => { totalWeight += item.weight * item.quantity; });
+            } else {
+                const sortedFood = [...foodItems].sort((a, b) => b.weight - a.weight);
+                let freeItemsBudget = 5;
+                sortedFood.forEach(foodItem => {
+                    if (freeItemsBudget <= 0) {
+                        totalWeight += foodItem.weight * foodItem.quantity;
+                    } else {
+                        const itemsToMakeFree = Math.min(foodItem.quantity, freeItemsBudget);
+                        totalWeight += (foodItem.quantity - itemsToMakeFree) * foodItem.weight;
+                        freeItemsBudget -= itemsToMakeFree;
+                    }
+                });
+            }
+            return totalWeight;
+        };
+        
+        const getSelectedCharacter = () => {
+            if (!state.characters) return null;
+            return state.characters.find(c => c.id === state.selectedCharacterId);
+        };
 
         // === イベントハンドラ ===
-        function handleDragStart(characterId, event) { /* ... 変更なし ... */ }
-        function handleDragOver(event) { /* ... 変更なし ... */ }
-        function handleDragLeave(event) { /* ... 変更なし ... */ }
-        function handleDragEnd(event) { /* ... 変更なし ... */ }
-        function handleDrop(targetCharacterId, event) { /* ... 変更なし ... */ }
-        function handleSortItems(key) { /* ... 変更なし ... */ }
-        function handleAddCharacter() { /* ... 変更なし ... */ }
-        function handleUpdateCharacterWeight() { /* ... 変更なし ... */ }
-        function handleDeleteCharacter(characterId, event) { /* ... 変更なし ... */ }
-        function handleAddItem() { /* ... 変更なし ... */ }
-        function handleUpdateItemQuantity(itemId, newQuantityStr) { /* ... 変更なし ... */ }
-        function handleDeleteItem(itemId) { /* ... 変更なし ... */ }
-        function handleToggleHolder(holderType) { /* ... 変更なし ... */ }
-        function handleMoveItem(targetCharacterId) { /* ... 変更なし ... */ }
-        function handleDeleteLog(logId) { /* ... 変更なし ... */ }
-        function handleClearAllLogs() { /* ... 変更なし ... */ }
+        function handleDragStart(characterId, event) { state.draggingCharacterId = characterId; event.target.classList.add('dragging'); }
+        function handleDragOver(event) { event.preventDefault(); const targetElement = event.target.closest('[draggable="true"]'); if (targetElement) { targetElement.classList.add('drag-over'); } }
+        function handleDragLeave(event) { const targetElement = event.target.closest('[draggable="true"]'); if (targetElement) { targetElement.classList.remove('drag-over'); } }
+        function handleDragEnd(event) { event.target.classList.remove('dragging'); document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over')); }
         
-        // (省略した関数をここにペースト)
-        const addLog = (message) => { const timestamp = new Date().toLocaleString('ja-JP'); const newLog = { id: Date.now(), timestamp, message }; if (!state.logs) state.logs = []; state.logs.unshift(newLog); };
-        const calculateCurrentWeight = (character) => { if (!character || !character.items) return 0; let totalWeight = 0; const nonFoodItems = character.items.filter(item => item.type !== '食料'); const foodItems = character.items.filter(item => item.type === '食料'); let heaviestWeapon = null; if (character.hasWeaponCase) { heaviestWeapon = nonFoodItems.filter(item => item.type === '武器').sort((a, b) => b.weight - a.weight)[0]; } nonFoodItems.forEach(item => { let itemWeight = item.weight * item.quantity; if (character.hasPotionHolder && item.type === 'ポーション' && item.weight === 1) { itemWeight = (item.quantity - Math.min(item.quantity, 5)) * item.weight; } else if (character.hasToolPouch && item.type === '道具' && item.weight === 1) { itemWeight = (item.quantity - Math.min(item.quantity, 5)) * item.weight; } else if (character.hasQuiver && item.type === '矢弾' && item.weight === 1) { itemWeight = (item.quantity - Math.min(item.quantity, 5)) * item.weight; } else if (heaviestWeapon && item.id === heaviestWeapon.id) { itemWeight = Math.max(0, item.quantity - 1) * item.weight; } totalWeight += itemWeight; }); if (!character.hasLunchBox) { foodItems.forEach(item => { totalWeight += item.weight * item.quantity; }); } else { const sortedFood = [...foodItems].sort((a, b) => b.weight - a.weight); let freeItemsBudget = 5; sortedFood.forEach(foodItem => { if (freeItemsBudget <= 0) { totalWeight += foodItem.weight * foodItem.quantity; } else { const itemsToMakeFree = Math.min(foodItem.quantity, freeItemsBudget); totalWeight += (foodItem.quantity - itemsToMakeFree) * foodItem.weight; freeItemsBudget -= itemsToMakeFree; } }); } return totalWeight; };
-        const getSelectedCharacter = () => { if (!state.characters) return null; return state.characters.find(c => c.id === state.selectedCharacterId); };
-        function handleDragStart(characterId, event) { state.draggingCharacterId = characterId; event.target.classList.add('dragging'); } function handleDragOver(event) { event.preventDefault(); const targetElement = event.target.closest('[draggable="true"]'); if (targetElement) { targetElement.classList.add('drag-over'); } } function handleDragLeave(event) { const targetElement = event.target.closest('[draggable="true"]'); if (targetElement) { targetElement.classList.remove('drag-over'); } } function handleDragEnd(event) { event.target.classList.remove('dragging'); document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over')); } function handleDrop(targetCharacterId, event) { event.preventDefault(); const draggedId = state.draggingCharacterId; if (draggedId === targetCharacterId) return; const draggedItem = state.characters.find(c => c.id === draggedId); const remainingItems = state.characters.filter(c => c.id !== draggedId); const targetIndex = remainingItems.findIndex(c => c.id === targetCharacterId); remainingItems.splice(targetIndex, 0, draggedItem); state.characters = remainingItems; const targetElement = event.target.closest('[draggable="true"]'); if (targetElement) targetElement.classList.remove('drag-over'); state.draggingCharacterId = null; updateFirebase(); }
-        function handleSortItems(key) { if (state.sort.key === key) { state.sort.order = state.sort.order === 'asc' ? 'desc' : 'asc'; } else { state.sort.key = key; state.sort.order = 'asc'; } render(); } function handleAddCharacter() { const { name, maxWeight } = state.characterForm; if (name.trim() === '' || maxWeight <= 0) { alert('名前と携帯可能重量を正しく入力してください。'); return; } const newCharacter = { id: Date.now(), name: name, maxWeight: Number(maxWeight), items: [], hasWeaponCase: false, hasPotionHolder: false, hasLunchBox: false, hasToolPouch: false, hasQuiver: false, }; if (!state.characters) state.characters = []; state.characters.push(newCharacter); if (!state.selectedCharacterId) { state.selectedCharacterId = newCharacter.id; } addLog(`${newCharacter.name}がパーティに参加しました。`); state.characterForm = { name: '', maxWeight: 0 }; state.showCharacterModal = false; updateFirebase(); } function handleUpdateCharacterWeight() { const character = state.characters.find(c => c.id === state.editingCharacterId); if (!character) return; const newMaxWeight = Number(state.editCharacterForm.maxWeight); if (newMaxWeight <= 0) { alert('携帯可能重量は0より大きい値を入力してください。'); return; } const oldMaxWeight = character.maxWeight; character.maxWeight = newMaxWeight; addLog(`${character.name} の携帯可能重量が ${Math.floor(oldMaxWeight)} から ${Math.floor(newMaxWeight)} に変更されました。`); state.showEditCharacterModal = false; state.editingCharacterId = null; updateFirebase(); }
-        function handleDeleteCharacter(characterId, event) { event.stopPropagation(); const characterToDelete = state.characters.find(c => c.id === characterId); if (!characterToDelete) return; if (window.confirm(`${characterToDelete.name} を削除しますか？\nこのキャラクターが所持しているアイテムも全て削除されます。`)) { const characterName = characterToDelete.name; state.characters = state.characters.filter(c => c.id !== characterId); if (state.selectedCharacterId === characterId) { state.selectedCharacterId = state.characters.length > 0 ? state.characters[0].id : null; } addLog(`${characterName} がパーティから離脱しました。`); updateFirebase(); } } function handleAddItem() { const selectedCharacter = getSelectedCharacter(); if (!selectedCharacter || state.itemForm.name.trim() === '') { alert('キャラクターを選択し、アイテム名を入力してください。'); return; } const newItem = { id: Date.now(), ...state.itemForm }; if (!selectedCharacter.items) selectedCharacter.items = []; selectedCharacter.items.push(newItem); addLog(`${selectedCharacter.name}が${newItem.name}(${newItem.quantity}個)を獲得しました。`); state.itemForm = { name: '', weight: 0, quantity: 1, sellPrice: 0, type: '武器' }; state.showItemModal = false; updateFirebase(); } function handleUpdateItemQuantity(itemId, newQuantityStr) { const selectedCharacter = getSelectedCharacter(); if (!selectedCharacter) return; const item = selectedCharacter.items.find(i => i.id === itemId); if (!item) return; const oldQuantity = item.quantity; const newQuantity = Number(Math.floor(newQuantityStr)); if (isNaN(newQuantity) || newQuantity < 1) { state.editingItemId = null; render(); return; } if (oldQuantity !== newQuantity) { item.quantity = newQuantity; addLog(`${selectedCharacter.name} が ${item.name} の個数を ${oldQuantity} から ${newQuantity} に変更しました。`); } state.editingItemId = null; updateFirebase(); }
-        function handleDeleteItem(itemId) { const selectedCharacter = getSelectedCharacter(); const item = selectedCharacter.items.find(i => i.id === itemId); if (!item || !window.confirm(`${item.name}を削除(破棄)しますか？この操作では共有財産は増えません。`)) { return; } selectedCharacter.items = selectedCharacter.items.filter(i => i.id !== itemId); addLog(`${selectedCharacter.name}が${item.name}(${item.quantity}個)を破棄しました。`); updateFirebase(); } function handleToggleHolder(holderType) { const selectedCharacter = getSelectedCharacter(); if (!selectedCharacter) return; selectedCharacter[holderType] = !selectedCharacter[holderType]; updateFirebase(); } function handleMoveItem(targetCharacterId) { const sourceCharacter = getSelectedCharacter(); const targetCharacter = state.characters.find(c => c.id === targetCharacterId); if (!state.moveItemData || !targetCharacter) return; const itemToMove = state.moveItemData.item; sourceCharacter.items = sourceCharacter.items.filter(i => i.id !== itemToMove.id); if (!targetCharacter.items) targetCharacter.items = []; targetCharacter.items.push({ ...itemToMove }); addLog(`${sourceCharacter.name}が${itemToMove.name}(${itemToMove.quantity}個)を${targetCharacter.name}に渡しました。`); state.showMoveModal = false; state.moveItemData = null; updateFirebase(); } function handleDeleteLog(logId) { if (!window.confirm('このログを削除しますか？')) return; state.logs = state.logs.filter(log => log.id !== logId); updateFirebase(); } function handleClearAllLogs() { if (!window.confirm('全てのログを削除しますか？')) return; state.logs = []; updateFirebase(); }
+        function handleDrop(targetCharacterId, event) {
+            event.preventDefault();
+            const draggedId = state.draggingCharacterId;
+            if (draggedId === targetCharacterId) return;
+            const draggedItem = state.characters.find(c => c.id === draggedId);
+            const remainingItems = state.characters.filter(c => c.id !== draggedId);
+            const targetIndex = remainingItems.findIndex(c => c.id === targetCharacterId);
+            remainingItems.splice(targetIndex, 0, draggedItem);
+            state.characters = remainingItems;
+            const targetElement = event.target.closest('[draggable="true"]');
+            if(targetElement) targetElement.classList.remove('drag-over');
+            state.draggingCharacterId = null;
+            updateFirebase();
+        }
+
+        function handleSortItems(key) {
+            if (state.sort.key === key) {
+                state.sort.order = state.sort.order === 'asc' ? 'desc' : 'asc';
+            } else {
+                state.sort.key = key;
+                state.sort.order = 'asc';
+            }
+            render();
+        }
+
+        function handleAddCharacter() {
+            const { name, maxWeight } = state.characterForm;
+            if (name.trim() === '' || maxWeight <= 0) { alert('名前と携帯可能重量を正しく入力してください。'); return; }
+            const newCharacter = { id: Date.now(), name: name, maxWeight: Number(maxWeight), items: [], hasWeaponCase: false, hasPotionHolder: false, hasLunchBox: false, hasToolPouch: false, hasQuiver: false, };
+            if (!state.characters) state.characters = [];
+            state.characters.push(newCharacter);
+            if (!state.selectedCharacterId) { state.selectedCharacterId = newCharacter.id; }
+            addLog(`${newCharacter.name}がパーティに参加しました。`);
+            state.characterForm = { name: '', maxWeight: 0 };
+            state.showCharacterModal = false;
+            updateFirebase();
+        }
+
+        function handleUpdateCharacterWeight() {
+            const character = state.characters.find(c => c.id === state.editingCharacterId);
+            if (!character) return;
+            const newMaxWeight = Number(state.editCharacterForm.maxWeight);
+            if (newMaxWeight <= 0) { alert('携帯可能重量は0より大きい値を入力してください。'); return; }
+            const oldMaxWeight = character.maxWeight;
+            character.maxWeight = newMaxWeight;
+            addLog(`${character.name} の携帯可能重量が ${Math.floor(oldMaxWeight)} から ${Math.floor(newMaxWeight)} に変更されました。`);
+            state.showEditCharacterModal = false;
+            state.editingCharacterId = null;
+            updateFirebase();
+        }
+
+        function handleDeleteCharacter(characterId, event) {
+            event.stopPropagation();
+            const characterToDelete = state.characters.find(c => c.id === characterId);
+            if (!characterToDelete) return;
+            if (window.confirm(`${characterToDelete.name} を削除しますか？\nこのキャラクターが所持しているアイテムも全て削除されます。`)) {
+                const characterName = characterToDelete.name;
+                state.characters = state.characters.filter(c => c.id !== characterId);
+                if (state.selectedCharacterId === characterId) {
+                    state.selectedCharacterId = state.characters.length > 0 ? state.characters[0].id : null;
+                }
+                addLog(`${characterName} がパーティから離脱しました。`);
+                updateFirebase();
+            }
+        }
+
+        function handleAddItem() {
+            const selectedCharacter = getSelectedCharacter();
+            if (!selectedCharacter || state.itemForm.name.trim() === '') { alert('キャラクターを選択し、アイテム名を入力してください。'); return; }
+            const newItem = { id: Date.now(), ...state.itemForm };
+            if (!selectedCharacter.items) selectedCharacter.items = [];
+            selectedCharacter.items.push(newItem);
+            addLog(`${selectedCharacter.name}が${newItem.name}(${newItem.quantity}個)を獲得しました。`);
+            state.itemForm = { name: '', weight: 0, quantity: 1, sellPrice: 0, type: '武器' };
+            state.showItemModal = false;
+            updateFirebase();
+        }
+        
+        function handleUpdateItemQuantity(itemId, newQuantityStr) {
+            const selectedCharacter = getSelectedCharacter();
+            if (!selectedCharacter) return;
+            const item = selectedCharacter.items.find(i => i.id === itemId);
+            if (!item) return;
+            const oldQuantity = item.quantity;
+            const newQuantity = Number(Math.floor(newQuantityStr));
+            if (isNaN(newQuantity) || newQuantity < 1) { state.editingItemId = null; render(); return; }
+            if (oldQuantity !== newQuantity) {
+                item.quantity = newQuantity;
+                addLog(`${selectedCharacter.name} が ${item.name} の個数を ${oldQuantity} から ${newQuantity} に変更しました。`);
+            }
+            state.editingItemId = null;
+            updateFirebase();
+        }
+
+        function handleDeleteItem(itemId) {
+            const selectedCharacter = getSelectedCharacter();
+            const item = selectedCharacter.items.find(i => i.id === itemId);
+            if (!item || !window.confirm(`${item.name}(${item.quantity}個)を削除(破棄)しますか？この操作では共有財産は増えません。`)) { return; }
+            selectedCharacter.items = selectedCharacter.items.filter(i => i.id !== itemId);
+            addLog(`${selectedCharacter.name}が${item.name}(${item.quantity}個)を破棄しました。`);
+            updateFirebase();
+        }
 
         /**
-         * ★新しく追加した関数
-         * アイテムを売却し、共有財産に加算します。
+         * ★変更点: 売却ロジックを更新
          */
         function handleSellItem(itemId) {
             const selectedCharacter = getSelectedCharacter();
             const item = selectedCharacter.items.find(i => i.id === itemId);
             if (!item) return;
 
-            if (window.confirm(`${item.name}(${item.quantity}個) を ${item.sellPrice}G で売却しますか？`)) {
-                // 共有財産に加算
+            // 合計売却額を計算
+            const totalSellValue = Number(item.sellPrice) * Number(item.quantity);
+
+            // 確認メッセージに合計額を表示
+            if (window.confirm(`${item.name}(${item.quantity}個) を合計 ${totalSellValue}G で売却しますか？`)) {
                 const oldMoney = state.sharedAssets.money || 0;
-                state.sharedAssets.money = oldMoney + Number(item.sellPrice);
+                // 合計額を加算
+                state.sharedAssets.money = oldMoney + totalSellValue;
                 
-                // アイテムを削除
                 selectedCharacter.items = selectedCharacter.items.filter(i => i.id !== itemId);
 
-                addLog(`${selectedCharacter.name} が ${item.name} を売却し、共有財産が ${item.sellPrice}G 増えました。`);
+                // ログメッセージに合計額を表示
+                addLog(`${selectedCharacter.name} が ${item.name}(${item.quantity}個) を売却し、共有財産が ${totalSellValue}G 増えました。`);
                 updateFirebase();
             }
         }
 
-        /**
-         * ★新しく追加した関数
-         * 共有財産を直接編集して更新します。
-         */
         function handleUpdateSharedMoney(newMoneyStr) {
             const newMoney = Number(Math.floor(newMoneyStr));
             if (isNaN(newMoney) || newMoney < 0) {
@@ -175,6 +301,11 @@
             state.editingSharedMoney = false;
             updateFirebase();
         }
+
+        function handleToggleHolder(holderType) { const selectedCharacter = getSelectedCharacter(); if (!selectedCharacter) return; selectedCharacter[holderType] = !selectedCharacter[holderType]; updateFirebase(); }
+        function handleMoveItem(targetCharacterId) { const sourceCharacter = getSelectedCharacter(); const targetCharacter = state.characters.find(c => c.id === targetCharacterId); if (!state.moveItemData || !targetCharacter) return; const itemToMove = state.moveItemData.item; sourceCharacter.items = sourceCharacter.items.filter(i => i.id !== itemToMove.id); if (!targetCharacter.items) targetCharacter.items = []; targetCharacter.items.push({ ...itemToMove }); addLog(`${sourceCharacter.name}が${itemToMove.name}(${itemToMove.quantity}個)を${targetCharacter.name}に渡しました。`); state.showMoveModal = false; state.moveItemData = null; updateFirebase(); }
+        function handleDeleteLog(logId) { if (!window.confirm('このログを削除しますか？')) return; state.logs = state.logs.filter(log => log.id !== logId); updateFirebase(); }
+        function handleClearAllLogs() { if (!window.confirm('全てのログを削除しますか？')) return; state.logs = []; updateFirebase(); }
 
 
         // === UI描画関数 ===
@@ -203,7 +334,6 @@
                     </h1>
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
                         <div>
-                            <!-- キャラクター管理エリア -->
                             <div class="bg-white rounded-lg shadow-md p-6 mb-6">
                                 <div class="flex justify-between items-center mb-4">
                                     <h2 class="text-xl font-semibold">キャラクター一覧</h2>
@@ -236,8 +366,6 @@
                                     }).join('')}
                                 </div>
                             </div>
-
-                            <!-- ★新設: 共有財産エリア -->
                             <div class="bg-white rounded-lg shadow-md p-6">
                                 <h2 class="text-xl font-semibold mb-2">共有財産</h2>
                                 <div class="text-2xl font-bold text-yellow-600">
@@ -286,7 +414,6 @@
                                                     <td class="border border-gray-300 px-3 py-2 text-right">${item.sellPrice}</td>
                                                     <td class="border border-gray-300 px-3 py-2">
                                                         <div class="flex gap-1 justify-center">
-                                                            <!-- ★新設: 売却ボタン -->
                                                             <button onclick="handleSellItem(${item.id})" class="bg-yellow-500 hover:bg-yellow-600 text-white p-1 rounded" title="売却"> ${icons.coin} </button>
                                                             <button onclick='state.moveItemData = { item: ${JSON.stringify(item)} }; state.showMoveModal = true; render();' class="bg-blue-500 hover:bg-blue-600 text-white p-1 rounded" title="移動">${icons.arrowRight}</button>
                                                             <button onclick="handleDeleteItem(${item.id})" class="bg-red-500 hover:bg-red-600 text-white p-1 rounded" title="削除（破棄）">${icons.trash}</button>
@@ -348,4 +475,4 @@
         });
     </script>
 </body>
-</html>
+</html>```
