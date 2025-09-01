@@ -35,9 +35,7 @@
             appId: "1:981495971926:web:74002f15af50317bab7bf7"
         };
         
-        // Firebaseを初期化
         firebase.initializeApp(firebaseConfig);
-        // Realtime Databaseへの参照を取得
         const database = firebase.database();
 
         // === SVGアイコン定義 ===
@@ -54,6 +52,11 @@
             characters: [],
             selectedCharacterId: null,
             logs: [],
+            // ★追加: ソートの状態を管理
+            sort: {
+                key: 'name', // 初期ソートキーはアイテム名
+                order: 'asc'  // 初期ソート順は昇順
+            },
             showCharacterModal: false,
             showItemModal: false,
             showMoveModal: false,
@@ -110,31 +113,23 @@
             const foodItems = character.items.filter(item => item.type === '食料');
             let heaviestWeapon = null;
             if (character.hasWeaponCase) {
-                heaviestWeapon = nonFoodItems
-                    .filter(item => item.type === '武器')
-                    .sort((a, b) => b.weight - a.weight)[0];
+                heaviestWeapon = nonFoodItems.filter(item => item.type === '武器').sort((a, b) => b.weight - a.weight)[0];
             }
             nonFoodItems.forEach(item => {
                 let itemWeight = item.weight * item.quantity;
                 if (character.hasPotionHolder && item.type === 'ポーション' && item.weight === 1) {
-                    const zeroQuantity = Math.min(item.quantity, 5);
-                    itemWeight = (item.quantity - zeroQuantity) * item.weight;
+                    itemWeight = (item.quantity - Math.min(item.quantity, 5)) * item.weight;
                 } else if (character.hasToolPouch && item.type === '道具' && item.weight === 1) {
-                    const zeroQuantity = Math.min(item.quantity, 5);
-                    itemWeight = (item.quantity - zeroQuantity) * item.weight;
+                    itemWeight = (item.quantity - Math.min(item.quantity, 5)) * item.weight;
                 } else if (character.hasQuiver && item.type === '矢弾' && item.weight === 1) {
-                    const zeroQuantity = Math.min(item.quantity, 5);
-                    itemWeight = (item.quantity - zeroQuantity) * item.weight;
+                    itemWeight = (item.quantity - Math.min(item.quantity, 5)) * item.weight;
                 } else if (heaviestWeapon && item.id === heaviestWeapon.id) {
-                    const remainingQuantity = Math.max(0, item.quantity - 1);
-                    itemWeight = remainingQuantity * item.weight;
+                    itemWeight = Math.max(0, item.quantity - 1) * item.weight;
                 }
                 totalWeight += itemWeight;
             });
             if (!character.hasLunchBox) {
-                foodItems.forEach(item => {
-                    totalWeight += item.weight * item.quantity;
-                });
+                foodItems.forEach(item => { totalWeight += item.weight * item.quantity; });
             } else {
                 const sortedFood = [...foodItems].sort((a, b) => b.weight - a.weight);
                 let freeItemsBudget = 5;
@@ -143,8 +138,7 @@
                         totalWeight += foodItem.weight * foodItem.quantity;
                     } else {
                         const itemsToMakeFree = Math.min(foodItem.quantity, freeItemsBudget);
-                        const itemsWithWeight = foodItem.quantity - itemsToMakeFree;
-                        totalWeight += itemsWithWeight * foodItem.weight;
+                        totalWeight += (foodItem.quantity - itemsToMakeFree) * foodItem.weight;
                         freeItemsBudget -= itemsToMakeFree;
                     }
                 });
@@ -176,6 +170,22 @@
             if(targetElement) targetElement.classList.remove('drag-over');
             state.draggingCharacterId = null;
             updateFirebase();
+        }
+
+        /**
+         * ★新しく追加した関数
+         * アイテムのソート条件を更新します。
+         */
+        function handleSortItems(key) {
+            if (state.sort.key === key) {
+                // 同じキーがクリックされたら、昇順/降順を切り替える
+                state.sort.order = state.sort.order === 'asc' ? 'desc' : 'asc';
+            } else {
+                // 新しいキーがクリックされたら、そのキーで昇順ソート
+                state.sort.key = key;
+                state.sort.order = 'asc';
+            }
+            render(); // 画面を再描画してソートを適用
         }
 
         function handleAddCharacter() {
@@ -295,6 +305,27 @@
             const currentWeight = selectedCharacter ? calculateCurrentWeight(selectedCharacter) : 0;
             const isOverWeight = selectedCharacter ? currentWeight > selectedCharacter.maxWeight : false;
 
+            // ★変更点: 表示する前にアイテムをソートする
+            let sortedItems = [];
+            if (selectedCharacter && selectedCharacter.items) {
+                // state.sortの条件に基づいて配列をソート
+                sortedItems = [...selectedCharacter.items].sort((a, b) => {
+                    const key = state.sort.key;
+                    const order = state.sort.order === 'asc' ? 1 : -1;
+
+                    const valA = a[key];
+                    const valB = b[key];
+
+                    if (typeof valA === 'number' && typeof valB === 'number') {
+                        return (valA - valB) * order;
+                    }
+                    if (typeof valA === 'string' && typeof valB === 'string') {
+                        return valA.localeCompare(valB) * order;
+                    }
+                    return 0;
+                });
+            }
+
             appContainer.innerHTML = `
                 <div class="max-w-7xl mx-auto">
                     <h1 class="text-3xl font-bold text-center mb-8 text-gray-800">
@@ -331,20 +362,8 @@
                                                 <div class="flex justify-between items-center">
                                                     <div class="font-medium text-lg">${character.name}</div>
                                                     <div class="flex items-center gap-1">
-                                                        <button 
-                                                            onclick="openEditCharacterModal(${character.id}, event)"
-                                                            class="text-blue-500 hover:text-blue-700 p-1 rounded-full hover:bg-blue-100 opacity-50 hover:opacity-100 transition-opacity"
-                                                            title="携帯可能重量を編集"
-                                                        >
-                                                            ${icons.edit}
-                                                        </button>
-                                                        <button 
-                                                            onclick="handleDeleteCharacter(${character.id}, event)" 
-                                                            class="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-100 opacity-50 hover:opacity-100 transition-opacity" 
-                                                            title="${character.name}を削除"
-                                                        >
-                                                            ${icons.trash}
-                                                        </button>
+                                                        <button onclick="openEditCharacterModal(${character.id}, event)" class="text-blue-500 hover:text-blue-700 p-1 rounded-full hover:bg-blue-100 opacity-50 hover:opacity-100 transition-opacity" title="携帯可能重量を編集"> ${icons.edit} </button>
+                                                        <button onclick="handleDeleteCharacter(${character.id}, event)" class="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-100 opacity-50 hover:opacity-100 transition-opacity" title="${character.name}を削除"> ${icons.trash} </button>
                                                     </div>
                                                 </div>
                                                 <div class="text-base ${isOver ? 'text-red-600 font-semibold' : 'text-gray-600'}">
@@ -383,16 +402,17 @@
                                     <table class="w-full border-collapse border border-gray-300">
                                         <thead>
                                             <tr class="bg-gray-50">
-                                                <th class="border border-gray-300 px-4 py-2 text-left">アイテム名</th>
-                                                <th class="border border-gray-300 px-2 py-2 text-left">種類</th>
-                                                <th class="border border-gray-300 px-2 py-2 text-right">重量</th>
-                                                <th class="border border-gray-300 px-2 py-2 text-right">個数</th>
-                                                <th class="border border-gray-300 px-3 py-2 text-right">売却額</th>
+                                                <!-- ★変更点: ヘッダーをソート用のボタンにする -->
+                                                <th class="border border-gray-300 px-4 py-2 text-left"><button onclick="handleSortItems('name')" class="font-bold w-full text-left">アイテム名 ${state.sort.key === 'name' ? (state.sort.order === 'asc' ? '▲' : '▼') : ''}</button></th>
+                                                <th class="border border-gray-300 px-2 py-2 text-left"><button onclick="handleSortItems('type')" class="font-bold w-full text-left">種類 ${state.sort.key === 'type' ? (state.sort.order === 'asc' ? '▲' : '▼') : ''}</button></th>
+                                                <th class="border border-gray-300 px-2 py-2 text-right"><button onclick="handleSortItems('weight')" class="font-bold w-full text-right">重量 ${state.sort.key === 'weight' ? (state.sort.order === 'asc' ? '▲' : '▼') : ''}</button></th>
+                                                <th class="border border-gray-300 px-2 py-2 text-right"><button onclick="handleSortItems('quantity')" class="font-bold w-full text-right">個数 ${state.sort.key === 'quantity' ? (state.sort.order === 'asc' ? '▲' : '▼') : ''}</button></th>
+                                                <th class="border border-gray-300 px-3 py-2 text-right"><button onclick="handleSortItems('sellPrice')" class="font-bold w-full text-right">売却額 ${state.sort.key === 'sellPrice' ? (state.sort.order === 'asc' ? '▲' : '▼') : ''}</button></th>
                                                 <th class="border border-gray-300 px-3 py-2 text-center">操作</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            ${(selectedCharacter.items || []).map(item => `
+                                            ${sortedItems.map(item => `
                                                 <tr class="hover:bg-gray-50">
                                                     <td class="border border-gray-300 px-4 py-2">${item.name}</td>
                                                     <td class="border border-gray-300 px-2 py-2">${item.type}</td>
@@ -431,129 +451,26 @@
         
         function renderModals() {
             let modalHTML = '';
-
             if (state.showCharacterModal) {
                 modalHTML += `
-                    <div class="modal-overlay">
-                        <div class="bg-white p-6 rounded-lg w-96">
-                            <h3 class="text-lg font-semibold mb-4">キャラクター追加</h3>
-                            <div class="space-y-4">
-                                <div>
-                                    <label class="block text-sm font-medium mb-1">キャラクター名</label>
-                                    <input type="text" value="${state.characterForm.name}" oninput="state.characterForm.name = this.value" class="w-full border border-gray-300 rounded px-3 py-2">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium mb-1">携帯可能重量</label>
-                                    <input type="number" min="0" value="${state.characterForm.maxWeight}" oninput="state.characterForm.maxWeight = Number(this.value)" class="w-full border border-gray-300 rounded px-3 py-2">
-                                </div>
-                            </div>
-                            <div class="flex justify-end space-x-2 mt-6">
-                                <button onclick="state.showCharacterModal = false; render();" class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50">キャンセル</button>
-                                <button onclick="handleAddCharacter()" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">追加</button>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="modal-overlay"> <div class="bg-white p-6 rounded-lg w-96"> <h3 class="text-lg font-semibold mb-4">キャラクター追加</h3> <div class="space-y-4"> <div> <label class="block text-sm font-medium mb-1">キャラクター名</label> <input type="text" value="${state.characterForm.name}" oninput="state.characterForm.name = this.value" class="w-full border border-gray-300 rounded px-3 py-2"> </div> <div> <label class="block text-sm font-medium mb-1">携帯可能重量</label> <input type="number" min="0" value="${state.characterForm.maxWeight}" oninput="state.characterForm.maxWeight = Number(this.value)" class="w-full border border-gray-300 rounded px-3 py-2"> </div> </div> <div class="flex justify-end space-x-2 mt-6"> <button onclick="state.showCharacterModal = false; render();" class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50">キャンセル</button> <button onclick="handleAddCharacter()" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">追加</button> </div> </div> </div>
                 `;
             }
-
             if (state.showItemModal) {
                 modalHTML += `
-                     <div class="modal-overlay">
-                        <div class="bg-white p-6 rounded-lg w-96">
-                            <h3 class="text-lg font-semibold mb-4">アイテム追加</h3>
-                            <div class="space-y-4">
-                                <div>
-                                    <label class="block text-sm font-medium mb-1">アイテム名</label>
-                                    <input type="text" value="${state.itemForm.name}" oninput="state.itemForm.name = this.value" class="w-full border border-gray-300 rounded px-3 py-2">
-                                </div>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="block text-sm font-medium mb-1">重量</label>
-                                        <input
-                                            type="number"
-                                            min="0"
-                                            step="1"
-                                            value="${state.itemForm.weight}"
-                                            oninput="this.value = Math.floor(this.value || 0); state.itemForm.weight = Number(this.value);"
-                                            class="w-full border border-gray-300 rounded px-3 py-2"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium mb-1">個数</label>
-                                        <input type="number" min="1" value="${state.itemForm.quantity}" oninput="state.itemForm.quantity = Number(this.value)" class="w-full border border-gray-300 rounded px-3 py-2"/>
-                                    </div>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium mb-1">売却金額</label>
-                                    <input type="number" min="0" value="${state.itemForm.sellPrice}" oninput="state.itemForm.sellPrice = Number(this.value)" class="w-full border border-gray-300 rounded px-3 py-2"/>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium mb-1">種類</label>
-                                    <select onchange="state.itemForm.type = this.value" class="w-full border border-gray-300 rounded px-3 py-2">
-                                        <option value="武器" ${state.itemForm.type === '武器' ? 'selected' : ''}>武器</option>
-                                        <option value="ポーション" ${state.itemForm.type === 'ポーション' ? 'selected' : ''}>ポーション</option>
-                                        <option value="食料" ${state.itemForm.type === '食料' ? 'selected' : ''}>食料</option>
-                                        <option value="道具" ${state.itemForm.type === '道具' ? 'selected' : ''}>道具</option>
-                                        <option value="矢弾" ${state.itemForm.type === '矢弾' ? 'selected' : ''}>矢弾</option>
-                                        <option value="その他" ${state.itemForm.type === 'その他' ? 'selected' : ''}>その他</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="flex justify-end space-x-2 mt-6">
-                                <button onclick="state.showItemModal = false; render();" class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50">キャンセル</button>
-                                <button onclick="handleAddItem()" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">追加</button>
-                            </div>
-                        </div>
-                    </div>
+                     <div class="modal-overlay"> <div class="bg-white p-6 rounded-lg w-96"> <h3 class="text-lg font-semibold mb-4">アイテム追加</h3> <div class="space-y-4"> <div> <label class="block text-sm font-medium mb-1">アイテム名</label> <input type="text" value="${state.itemForm.name}" oninput="state.itemForm.name = this.value" class="w-full border border-gray-300 rounded px-3 py-2"> </div> <div class="grid grid-cols-2 gap-4"> <div> <label class="block text-sm font-medium mb-1">重量</label> <input type="number" min="0" step="1" value="${state.itemForm.weight}" oninput="this.value = Math.floor(this.value || 0); state.itemForm.weight = Number(this.value);" class="w-full border border-gray-300 rounded px-3 py-2"/> </div> <div> <label class="block text-sm font-medium mb-1">個数</label> <input type="number" min="1" value="${state.itemForm.quantity}" oninput="state.itemForm.quantity = Number(this.value)" class="w-full border border-gray-300 rounded px-3 py-2"/> </div> </div> <div> <label class="block text-sm font-medium mb-1">売却金額</label> <input type="number" min="0" value="${state.itemForm.sellPrice}" oninput="state.itemForm.sellPrice = Number(this.value)" class="w-full border border-gray-300 rounded px-3 py-2"/> </div> <div> <label class="block text-sm font-medium mb-1">種類</label> <select onchange="state.itemForm.type = this.value" class="w-full border border-gray-300 rounded px-3 py-2"> <option value="武器" ${state.itemForm.type === '武器' ? 'selected' : ''}>武器</option> <option value="ポーション" ${state.itemForm.type === 'ポーション' ? 'selected' : ''}>ポーション</option> <option value="食料" ${state.itemForm.type === '食料' ? 'selected' : ''}>食料</option> <option value="道具" ${state.itemForm.type === '道具' ? 'selected' : ''}>道具</option> <option value="矢弾" ${state.itemForm.type === '矢弾' ? 'selected' : ''}>矢弾</option> <option value="その他" ${state.itemForm.type === 'その他' ? 'selected' : ''}>その他</option> </select> </div> </div> <div class="flex justify-end space-x-2 mt-6"> <button onclick="state.showItemModal = false; render();" class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50">キャンセル</button> <button onclick="handleAddItem()" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">追加</button> </div> </div> </div>
                 `;
             }
-            
             if (state.showMoveModal && state.moveItemData) {
                  modalHTML += `
-                    <div class="modal-overlay">
-                        <div class="bg-white p-6 rounded-lg w-96">
-                            <h3 class="text-lg font-semibold mb-4">アイテム移動</h3>
-                            <p class="mb-4"><strong>${state.moveItemData.item.name}</strong> を誰に渡しますか？</p>
-                            <div class="space-y-2 mb-6">
-                                ${state.characters.filter(c => c.id !== state.selectedCharacterId).map(character => `
-                                    <button onclick="handleMoveItem(${character.id})" class="w-full text-left p-3 border border-gray-300 rounded hover:bg-gray-50">
-                                        ${character.name}
-                                    </button>
-                                `).join('')}
-                            </div>
-                            <div class="flex justify-end">
-                                <button onclick="state.showMoveModal = false; state.moveItemData = null; render();" class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50">キャンセル</button>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="modal-overlay"> <div class="bg-white p-6 rounded-lg w-96"> <h3 class="text-lg font-semibold mb-4">アイテム移動</h3> <p class="mb-4"><strong>${state.moveItemData.item.name}</strong> を誰に渡しますか？</p> <div class="space-y-2 mb-6"> ${state.characters.filter(c => c.id !== state.selectedCharacterId).map(character => `<button onclick="handleMoveItem(${character.id})" class="w-full text-left p-3 border border-gray-300 rounded hover:bg-gray-50"> ${character.name} </button>`).join('')} </div> <div class="flex justify-end"> <button onclick="state.showMoveModal = false; state.moveItemData = null; render();" class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50">キャンセル</button> </div> </div> </div>
                 `;
             }
-            
             if (state.showEditCharacterModal) {
                 const character = state.characters.find(c => c.id === state.editingCharacterId);
                 if(character) {
                     modalHTML += `
-                        <div class="modal-overlay">
-                            <div class="bg-white p-6 rounded-lg w-96">
-                                <h3 class="text-lg font-semibold mb-4">${character.name} の携帯可能重量を編集</h3>
-                                <div class="space-y-4">
-                                    <div>
-                                        <label class="block text-sm font-medium mb-1">新しい携帯可能重量</label>
-                                        <input 
-                                            type="number" 
-                                            min="0" 
-                                            value="${state.editCharacterForm.maxWeight}" 
-                                            oninput="state.editCharacterForm.maxWeight = this.value" 
-                                            class="w-full border border-gray-300 rounded px-3 py-2"
-                                        >
-                                    </div>
-                                </div>
-                                <div class="flex justify-end space-x-2 mt-6">
-                                    <button onclick="state.showEditCharacterModal = false; state.editingCharacterId = null; render();" class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50">キャンセル</button>
-                                    <button onclick="handleUpdateCharacterWeight()" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">更新</button>
-                                </div>
-                            </div>
-                        </div>
+                        <div class="modal-overlay"> <div class="bg-white p-6 rounded-lg w-96"> <h3 class="text-lg font-semibold mb-4">${character.name} の携帯可能重量を編集</h3> <div class="space-y-4"> <div> <label class="block text-sm font-medium mb-1">新しい携帯可能重量</label> <input type="number" min="0" value="${state.editCharacterForm.maxWeight}" oninput="state.editCharacterForm.maxWeight = this.value" class="w-full border border-gray-300 rounded px-3 py-2" > </div> </div> <div class="flex justify-end space-x-2 mt-6"> <button onclick="state.showEditCharacterModal = false; state.editingCharacterId = null; render();" class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50">キャンセル</button> <button onclick="handleUpdateCharacterWeight()" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">更新</button> </div> </div> </div>
                     `;
                 }
             }
