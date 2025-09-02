@@ -63,7 +63,7 @@
         const addLog = (message) => { const timestamp = new Date().toLocaleString('ja-JP'); const newLog = { id: Date.now(), timestamp, message }; if (!state.logs) state.logs = []; state.logs.unshift(newLog); };
         
         /**
-         * ★変更点: ポーションホルダーの計算ロジックを修正
+         * ★変更点: この関数全体を修正
          */
         const calculateCurrentWeight = (character) => {
             if (!character || !character.items) return 0;
@@ -71,19 +71,17 @@
             let totalWeight = 0;
             const heaviestWeapon = character.hasWeaponCase ? character.items.filter(item => item.type === '武器').sort((a, b) => b.weight - a.weight)[0] : null;
 
-            // --- ポーションホルダーの計算 ---
-            let totalWeight1Potions = 0;
+            // --- 特殊効果を持つアイテムの重量を先に計算 ---
+            
+            // ポーションホルダー
             if (character.hasPotionHolder) {
-                // 重量1のポーションの合計個数を計算
                 const totalPotionCount = character.items
                     .filter(item => item.type === 'ポーション' && item.weight === 1)
                     .reduce((sum, item) => sum + item.quantity, 0);
-                
-                // 5個を超えた分だけ重量を加算
                 totalWeight += Math.max(0, totalPotionCount - 5);
             }
 
-            // --- ランチボックスの計算 ---
+            // ランチボックス
             if (character.hasLunchBox) {
                 const foodItems = character.items.filter(item => item.type === '食料');
                 const sortedFood = [...foodItems].sort((a, b) => b.weight - a.weight);
@@ -99,18 +97,13 @@
                     }
                 });
             }
-
-            // --- その他のアイテムの計算 ---
+            
+            // --- 通常アイテムの重量を計算 ---
             character.items.forEach(item => {
-                // ポーションホルダーの対象だったアイテムは計算済みなのでスキップ
-                if (character.hasPotionHolder && item.type === 'ポーション' && item.weight === 1) {
-                    return;
-                }
-                // ランチボックスの対象だったアイテムも計算済みなのでスキップ
-                if (character.hasLunchBox && item.type === '食料') {
-                    return;
-                }
-
+                // 特殊効果の対象だったものは計算済みなのでスキップ
+                if (character.hasPotionHolder && item.type === 'ポーション' && item.weight === 1) return;
+                if (character.hasLunchBox && item.type === '食料') return;
+                
                 let itemWeight = item.weight * item.quantity;
 
                 if (character.hasToolPouch && item.type === '道具' && item.weight === 1) {
@@ -120,13 +113,13 @@
                 } else if (heaviestWeapon && item.id === heaviestWeapon.id) {
                     itemWeight = Math.max(0, item.quantity - 1) * item.weight;
                 }
-
+                
                 totalWeight += itemWeight;
             });
             
             return totalWeight;
         };
-        
+
         const getSelectedCharacter = () => { if (!state.characters) return null; return state.characters.find(c => c.id === state.selectedCharacterId); };
         
         // === イベントハンドラ (変更なし) ===
