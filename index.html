@@ -6,6 +6,7 @@
     <title>アリアンロッド2e アイテム管理ツール</title>
     <script src="https://cdn.tailwindcss.com"></script>
     
+    <!-- Firebaseのライブラリを読み込む -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
@@ -43,16 +44,7 @@
         const database = firebase.database();
 
         // === SVGアイコン定義 ===
-        const icons = {
-            plus: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>`,
-            trash: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`,
-            arrowRight: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>`,
-            edit: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`,
-            grip: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400 cursor-move"><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>`,
-            coin: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="8"></line></svg>`,
-            // ★追加: 使用アイコン
-            use: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.31"></path><path d="M14 9.31V2"></path><path d="M12 22a7 7 0 0 0 7-7c0-2.24-1.2-4.2-3-5.31"></path><path d="M5 15c-1.8-1.11-3-3.07-3-5.31A7 7 0 0 1 12 2a7 7 0 0 1 3.5 1"></path></svg>`
-        };
+        const icons = { plus: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>`, trash: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`, arrowRight: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>`, edit: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`, grip: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400 cursor-move"><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>`, coin: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="8"></line></svg>` };
 
         // === アプリケーションの状態管理 ===
         let state = {
@@ -65,20 +57,16 @@
             showItemModal: false,
             showMoveModal: false,
             moveItemData: null,
-            // ★追加: アイテム使用モーダルの状態
-            showUseItemModal: false,
-            useItemData: {
-                id: null,
-                name: '',
-                maxQuantity: 1,
-                useQuantity: 1
-            },
             characterForm: { name: '', maxWeight: 0 },
             itemForm: { name: '', weight: 0, quantity: 1, sellPrice: 0, type: '武器' },
             showEditCharacterModal: false,
             editingCharacterId: null,
             editCharacterForm: { maxWeight: 0 },
-            editingItemField: { id: null, field: null },
+            // ★変更点: アイテムのどの項目を編集しているか詳細に管理
+            editingItemField: {
+                id: null,    // どのアイテムIDか
+                field: null, // どの項目か (quantity, type, weightなど)
+            },
             draggingCharacterId: null,
             editingSharedMoney: false,
         };
@@ -86,93 +74,75 @@
         const appContainer = document.getElementById('app');
 
         // === データ処理 (変更なし) ===
-        function updateFirebase() { /* ... */ }
-        function setupDataListener() { /* ... */ }
-        
-        // === ヘルパー関数 (変更なし) ===
-        const addLog = (message) => { /* ... */ };
-        const calculateCurrentWeight = (character) => { /* ... */ };
-        const getSelectedCharacter = () => { /* ... */ };
-
-        // === イベントハンドラ ===
-        function handleDragStart(characterId, event) { /* ... */ }
-        function handleDragOver(event) { /* ... */ }
-        function handleDragLeave(event) { /* ... */ }
-        function handleDragEnd(event) { /* ... */ }
-        function handleDrop(targetCharacterId, event) { /* ... */ }
-        function handleSortItems(key) { /* ... */ }
-        function handleAddCharacter() { /* ... */ }
-        function handleUpdateCharacterWeight() { /* ... */ }
-        function handleDeleteCharacter(characterId, event) { /* ... */ }
-        function handleAddItem() { /* ... */ }
-        function handleUpdateItemField(itemId, field, newValueStr) { /* ... */ }
-        function handleDeleteItem(itemId) { /* ... */ }
-        function handleSellItem(itemId) { /* ... */ }
-        function handleUpdateSharedMoney(newMoneyStr) { /* ... */ }
-        function handleToggleHolder(holderType) { /* ... */ }
-        function handleMoveItem(targetCharacterId) { /* ... */ }
-        function handleDeleteLog(logId) { /* ... */ }
-        function handleClearAllLogs() { /* ... */ }
-
-        // (省略した関数をここにペースト)
         function updateFirebase() { const dataToSave = { characters: state.characters, sharedAssets: state.sharedAssets, selectedCharacterId: state.selectedCharacterId, logs: state.logs, }; database.ref().set(dataToSave); }
         function setupDataListener() { database.ref().on('value', (snapshot) => { const data = snapshot.val(); if (data) { state.characters = data.characters || []; state.sharedAssets = data.sharedAssets || { money: 0 }; state.selectedCharacterId = data.selectedCharacterId || null; state.logs = data.logs || []; } else { state.characters = []; state.sharedAssets = { money: 0 }; state.selectedCharacterId = null; state.logs = []; } render(); }); }
+
+        // === ヘルパー関数 (変更なし) ===
         const addLog = (message) => { const timestamp = new Date().toLocaleString('ja-JP'); const newLog = { id: Date.now(), timestamp, message }; if (!state.logs) state.logs = []; state.logs.unshift(newLog); };
         const calculateCurrentWeight = (character) => { if (!character || !character.items) return 0; let totalWeight = 0; const nonFoodItems = character.items.filter(item => item.type !== '食料'); const foodItems = character.items.filter(item => item.type === '食料'); let heaviestWeapon = null; if (character.hasWeaponCase) { heaviestWeapon = nonFoodItems.filter(item => item.type === '武器').sort((a, b) => b.weight - a.weight)[0]; } nonFoodItems.forEach(item => { let itemWeight = item.weight * item.quantity; if (character.hasPotionHolder && item.type === 'ポーション' && item.weight === 1) { itemWeight = (item.quantity - Math.min(item.quantity, 5)) * item.weight; } else if (character.hasToolPouch && item.type === '道具' && item.weight === 1) { itemWeight = (item.quantity - Math.min(item.quantity, 5)) * item.weight; } else if (character.hasQuiver && item.type === '矢弾' && item.weight === 1) { itemWeight = (item.quantity - Math.min(item.quantity, 5)) * item.weight; } else if (heaviestWeapon && item.id === heaviestWeapon.id) { itemWeight = Math.max(0, item.quantity - 1) * item.weight; } totalWeight += itemWeight; }); if (!character.hasLunchBox) { foodItems.forEach(item => { totalWeight += item.weight * item.quantity; }); } else { const sortedFood = [...foodItems].sort((a, b) => b.weight - a.weight); let freeItemsBudget = 5; sortedFood.forEach(foodItem => { if (freeItemsBudget <= 0) { totalWeight += foodItem.weight * foodItem.quantity; } else { const itemsToMakeFree = Math.min(foodItem.quantity, freeItemsBudget); totalWeight += (foodItem.quantity - itemsToMakeFree) * foodItem.weight; freeItemsBudget -= itemsToMakeFree; } }); } return totalWeight; };
         const getSelectedCharacter = () => { if (!state.characters) return null; return state.characters.find(c => c.id === state.selectedCharacterId); };
-        function handleDragStart(characterId, event) { state.draggingCharacterId = characterId; event.target.classList.add('dragging'); } function handleDragOver(event) { event.preventDefault(); const targetElement = event.target.closest('[draggable="true"]'); if (targetElement) { targetElement.classList.add('drag-over'); } } function handleDragLeave(event) { const targetElement = event.target.closest('[draggable="true"]'); if (targetElement) { targetElement.classList.remove('drag-over'); } } function handleDragEnd(event) { event.target.classList.remove('dragging'); document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over')); } function handleDrop(targetCharacterId, event) { event.preventDefault(); const draggedId = state.draggingCharacterId; if (draggedId === targetCharacterId) return; const draggedItem = state.characters.find(c => c.id === draggedId); const remainingItems = state.characters.filter(c => c.id !== draggedId); const targetIndex = remainingItems.findIndex(c => c.id === targetCharacterId); remainingItems.splice(targetIndex, 0, draggedItem); state.characters = remainingItems; const targetElement = event.target.closest('[draggable="true"]'); if (targetElement) targetElement.classList.remove('drag-over'); state.draggingCharacterId = null; updateFirebase(); }
-        function handleSortItems(key) { if (state.sort.key === key) { state.sort.order = state.sort.order === 'asc' ? 'desc' : 'asc'; } else { state.sort.key = key; state.sort.order = 'asc'; } render(); } function handleAddCharacter() { const { name, maxWeight } = state.characterForm; if (name.trim() === '' || maxWeight <= 0) { alert('名前と携帯可能重量を正しく入力してください。'); return; } const newCharacter = { id: Date.now(), name: name, maxWeight: Number(maxWeight), items: [], hasWeaponCase: false, hasPotionHolder: false, hasLunchBox: false, hasToolPouch: false, hasQuiver: false, }; if (!state.characters) state.characters = []; state.characters.push(newCharacter); if (!state.selectedCharacterId) { state.selectedCharacterId = newCharacter.id; } addLog(`${newCharacter.name}がパーティに参加しました。`); state.characterForm = { name: '', maxWeight: 0 }; state.showCharacterModal = false; updateFirebase(); } function handleUpdateCharacterWeight() { const character = state.characters.find(c => c.id === state.editingCharacterId); if (!character) return; const newMaxWeight = Number(state.editCharacterForm.maxWeight); if (newMaxWeight <= 0) { alert('携帯可能重量は0より大きい値を入力してください。'); return; } const oldMaxWeight = character.maxWeight; character.maxWeight = newMaxWeight; addLog(`${character.name} の携帯可能重量が ${Math.floor(oldMaxWeight)} から ${Math.floor(newMaxWeight)} に変更されました。`); state.showEditCharacterModal = false; state.editingCharacterId = null; updateFirebase(); }
-        function handleDeleteCharacter(characterId, event) { event.stopPropagation(); const characterToDelete = state.characters.find(c => c.id === characterId); if (!characterToDelete) return; if (window.confirm(`${characterToDelete.name} を削除しますか？\nこのキャラクターが所持しているアイテムも全て削除されます。`)) { const characterName = characterToDelete.name; state.characters = state.characters.filter(c => c.id !== characterId); if (state.selectedCharacterId === characterId) { state.selectedCharacterId = state.characters.length > 0 ? state.characters[0].id : null; } addLog(`${characterName} がパーティから離脱しました。`); updateFirebase(); } } function handleAddItem() { const selectedCharacter = getSelectedCharacter(); if (!selectedCharacter || state.itemForm.name.trim() === '') { alert('キャラクターを選択し、アイテム名を入力してください。'); return; } const newItem = { id: Date.now(), ...state.itemForm }; if (!selectedCharacter.items) selectedCharacter.items = []; selectedCharacter.items.push(newItem); addLog(`${selectedCharacter.name}が${newItem.name}(${newItem.quantity}個)を獲得しました。`); state.itemForm = { name: '', weight: 0, quantity: 1, sellPrice: 0, type: '武器' }; state.showItemModal = false; updateFirebase(); } function handleUpdateItemField(itemId, field, newValueStr) { const selectedCharacter = getSelectedCharacter(); const item = selectedCharacter?.items.find(i => i.id === itemId); if (!item) return; const oldValue = item[field]; let newValue = newValueStr; let fieldName = ''; switch (field) { case 'quantity': fieldName = '個数'; newValue = Number(Math.floor(newValueStr)); if (isNaN(newValue) || newValue < 1) { state.editingItemField = { id: null, field: null }; render(); return; } break; case 'weight': fieldName = '重量'; newValue = Number(Math.floor(newValueStr)); if (isNaN(newValue) || newValue < 0) { state.editingItemField = { id: null, field: null }; render(); return; } break; case 'sellPrice': fieldName = '売却額'; newValue = Number(Math.floor(newValueStr)); if (isNaN(newValue) || newValue < 0) { state.editingItemField = { id: null, field: null }; render(); return; } break; case 'type': fieldName = '種類'; break; } if (oldValue !== newValue) { item[field] = newValue; addLog(`${selectedCharacter.name}が${item.name}の${fieldName}を「${oldValue}」から「${newValue}」に変更しました。`); } state.editingItemField = { id: null, field: null }; updateFirebase(); }
-        function handleDeleteItem(itemId) { const selectedCharacter = getSelectedCharacter(); const item = selectedCharacter.items.find(i => i.id === itemId); if (!item || !window.confirm(`${item.name}(${item.quantity}個)を削除(破棄)しますか？この操作では共有財産は増えません。`)) { return; } selectedCharacter.items = selectedCharacter.items.filter(i => i.id !== itemId); addLog(`${selectedCharacter.name}が${item.name}(${item.quantity}個)を破棄しました。`); updateFirebase(); } function handleSellItem(itemId) { const selectedCharacter = getSelectedCharacter(); const item = selectedCharacter.items.find(i => i.id === itemId); if (!item) return; const totalSellValue = Number(item.sellPrice) * Number(item.quantity); if (window.confirm(`${item.name}(${item.quantity}個) を合計 ${totalSellValue}G で売却しますか？`)) { const oldMoney = state.sharedAssets.money || 0; state.sharedAssets.money = oldMoney + totalSellValue; selectedCharacter.items = selectedCharacter.items.filter(i => i.id !== itemId); addLog(`${selectedCharacter.name} が ${item.name}(${item.quantity}個) を売却し、共有財産が ${totalSellValue}G 増えました。`); updateFirebase(); } } function handleUpdateSharedMoney(newMoneyStr) { const newMoney = Number(Math.floor(newMoneyStr)); if (isNaN(newMoney) || newMoney < 0) { state.editingSharedMoney = false; render(); return; } if (state.sharedAssets.money !== newMoney) { addLog(`共有財産が ${state.sharedAssets.money}G から ${newMoney}G に変更されました。`); state.sharedAssets.money = newMoney; } state.editingSharedMoney = false; updateFirebase(); } function handleToggleHolder(holderType) { const selectedCharacter = getSelectedCharacter(); if (!selectedCharacter) return; selectedCharacter[holderType] = !selectedCharacter[holderType]; updateFirebase(); } function handleMoveItem(targetCharacterId) { const sourceCharacter = getSelectedCharacter(); const targetCharacter = state.characters.find(c => c.id === targetCharacterId); if (!state.moveItemData || !targetCharacter) return; const itemToMove = state.moveItemData.item; sourceCharacter.items = sourceCharacter.items.filter(i => i.id !== itemToMove.id); if (!targetCharacter.items) targetCharacter.items = []; targetCharacter.items.push({ ...itemToMove }); addLog(`${sourceCharacter.name}が${itemToMove.name}(${itemToMove.quantity}個)を${targetCharacter.name}に渡しました。`); state.showMoveModal = false; state.moveItemData = null; updateFirebase(); } function handleDeleteLog(logId) { if (!window.confirm('このログを削除しますか？')) return; state.logs = state.logs.filter(log => log.id !== logId); updateFirebase(); } function handleClearAllLogs() { if (!window.confirm('全てのログを削除しますか？')) return; state.logs = []; updateFirebase(); }
-
+        
+        // === イベントハンドラ ===
+        function handleDragStart(characterId, event) { state.draggingCharacterId = characterId; event.target.classList.add('dragging'); } function handleDragOver(event) { event.preventDefault(); const targetElement = event.target.closest('[draggable="true"]'); if (targetElement) { targetElement.classList.add('drag-over'); } } function handleDragLeave(event) { const targetElement = event.target.closest('[draggable="true"]'); if (targetElement) { targetElement.classList.remove('drag-over'); } } function handleDragEnd(event) { event.target.classList.remove('dragging'); document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over')); }
+        function handleDrop(targetCharacterId, event) { event.preventDefault(); const draggedId = state.draggingCharacterId; if (draggedId === targetCharacterId) return; const draggedItem = state.characters.find(c => c.id === draggedId); const remainingItems = state.characters.filter(c => c.id !== draggedId); const targetIndex = remainingItems.findIndex(c => c.id === targetCharacterId); remainingItems.splice(targetIndex, 0, draggedItem); state.characters = remainingItems; const targetElement = event.target.closest('[draggable="true"]'); if (targetElement) targetElement.classList.remove('drag-over'); state.draggingCharacterId = null; updateFirebase(); }
+        function handleSortItems(key) { if (state.sort.key === key) { state.sort.order = state.sort.order === 'asc' ? 'desc' : 'asc'; } else { state.sort.key = key; state.sort.order = 'asc'; } render(); }
+        function handleAddCharacter() { const { name, maxWeight } = state.characterForm; if (name.trim() === '' || maxWeight <= 0) { alert('名前と携帯可能重量を正しく入力してください。'); return; } const newCharacter = { id: Date.now(), name: name, maxWeight: Number(maxWeight), items: [], hasWeaponCase: false, hasPotionHolder: false, hasLunchBox: false, hasToolPouch: false, hasQuiver: false, }; if (!state.characters) state.characters = []; state.characters.push(newCharacter); if (!state.selectedCharacterId) { state.selectedCharacterId = newCharacter.id; } addLog(`${newCharacter.name}がパーティに参加しました。`); state.characterForm = { name: '', maxWeight: 0 }; state.showCharacterModal = false; updateFirebase(); }
+        function handleUpdateCharacterWeight() { const character = state.characters.find(c => c.id === state.editingCharacterId); if (!character) return; const newMaxWeight = Number(state.editCharacterForm.maxWeight); if (newMaxWeight <= 0) { alert('携帯可能重量は0より大きい値を入力してください。'); return; } const oldMaxWeight = character.maxWeight; character.maxWeight = newMaxWeight; addLog(`${character.name} の携帯可能重量が ${Math.floor(oldMaxWeight)} から ${Math.floor(newMaxWeight)} に変更されました。`); state.showEditCharacterModal = false; state.editingCharacterId = null; updateFirebase(); }
+        function handleDeleteCharacter(characterId, event) { event.stopPropagation(); const characterToDelete = state.characters.find(c => c.id === characterId); if (!characterToDelete) return; if (window.confirm(`${characterToDelete.name} を削除しますか？\nこのキャラクターが所持しているアイテムも全て削除されます。`)) { const characterName = characterToDelete.name; state.characters = state.characters.filter(c => c.id !== characterId); if (state.selectedCharacterId === characterId) { state.selectedCharacterId = state.characters.length > 0 ? state.characters[0].id : null; } addLog(`${characterName} がパーティから離脱しました。`); updateFirebase(); } }
+        function handleAddItem() { const selectedCharacter = getSelectedCharacter(); if (!selectedCharacter || state.itemForm.name.trim() === '') { alert('キャラクターを選択し、アイテム名を入力してください。'); return; } const newItem = { id: Date.now(), ...state.itemForm }; if (!selectedCharacter.items) selectedCharacter.items = []; selectedCharacter.items.push(newItem); addLog(`${selectedCharacter.name}が${newItem.name}(${newItem.quantity}個)を獲得しました。`); state.itemForm = { name: '', weight: 0, quantity: 1, sellPrice: 0, type: '武器' }; state.showItemModal = false; updateFirebase(); }
+        
         /**
-         * ★新しく追加した関数
-         * アイテム使用モーダルを開きます。
+         * ★変更点: handleUpdateItemQuantityを汎用的な関数に統合
+         * アイテムの指定されたフィールド（項目）を更新します。
          */
-        function openUseItemModal(itemId) {
+        function handleUpdateItemField(itemId, field, newValueStr) {
             const selectedCharacter = getSelectedCharacter();
             const item = selectedCharacter?.items.find(i => i.id === itemId);
             if (!item) return;
-            
-            state.useItemData = {
-                id: item.id,
-                name: item.name,
-                maxQuantity: item.quantity,
-                useQuantity: 1 // 初期値は1
-            };
-            state.showUseItemModal = true;
-            render();
-        }
-        
-        /**
-         * ★新しく追加した関数
-         * アイテムを使用し、個数を減らします。
-         */
-        function handleUseItem() {
-            const { id, useQuantity } = state.useItemData;
-            const selectedCharacter = getSelectedCharacter();
-            const item = selectedCharacter?.items.find(i => i.id === id);
-            
-            if (!item || useQuantity < 1 || useQuantity > item.quantity) {
-                alert("不正な数量です。");
-                return;
+
+            const oldValue = item[field];
+            let newValue = newValueStr;
+            let fieldName = ''; // ログ表示用の日本語名
+
+            // フィールドに応じてバリデーションと型変換
+            switch(field) {
+                case 'quantity':
+                    fieldName = '個数';
+                    newValue = Number(Math.floor(newValueStr));
+                    if (isNaN(newValue) || newValue < 1) { state.editingItemField = { id: null, field: null }; render(); return; }
+                    break;
+                case 'weight':
+                    fieldName = '重量';
+                    newValue = Number(Math.floor(newValueStr));
+                    if (isNaN(newValue) || newValue < 0) { state.editingItemField = { id: null, field: null }; render(); return; }
+                    break;
+                case 'sellPrice':
+                    fieldName = '売却額';
+                    newValue = Number(Math.floor(newValueStr));
+                    if (isNaN(newValue) || newValue < 0) { state.editingItemField = { id: null, field: null }; render(); return; }
+                    break;
+                case 'type':
+                    fieldName = '種類';
+                    // newValueは文字列なのでそのまま
+                    break;
             }
 
-            const newQuantity = item.quantity - useQuantity;
-
-            addLog(`${selectedCharacter.name}が${item.name}を ${useQuantity}個 使用しました。`);
-            
-            if (newQuantity <= 0) {
-                // 個数が0になったらアイテムを削除
-                selectedCharacter.items = selectedCharacter.items.filter(i => i.id !== id);
-            } else {
-                // 個数を減らす
-                item.quantity = newQuantity;
+            if (oldValue !== newValue) {
+                item[field] = newValue;
+                addLog(`${selectedCharacter.name}が${item.name}の${fieldName}を「${oldValue}」から「${newValue}」に変更しました。`);
             }
 
-            state.showUseItemModal = false;
+            state.editingItemField = { id: null, field: null }; // 編集モードを終了
             updateFirebase();
         }
+
+        function handleDeleteItem(itemId) { const selectedCharacter = getSelectedCharacter(); const item = selectedCharacter.items.find(i => i.id === itemId); if (!item || !window.confirm(`${item.name}(${item.quantity}個)を削除(破棄)しますか？この操作では共有財産は増えません。`)) { return; } selectedCharacter.items = selectedCharacter.items.filter(i => i.id !== itemId); addLog(`${selectedCharacter.name}が${item.name}(${item.quantity}個)を破棄しました。`); updateFirebase(); }
+        function handleSellItem(itemId) { const selectedCharacter = getSelectedCharacter(); const item = selectedCharacter.items.find(i => i.id === itemId); if (!item) return; const totalSellValue = Number(item.sellPrice) * Number(item.quantity); if (window.confirm(`${item.name}(${item.quantity}個) を合計 ${totalSellValue}G で売却しますか？`)) { const oldMoney = state.sharedAssets.money || 0; state.sharedAssets.money = oldMoney + totalSellValue; selectedCharacter.items = selectedCharacter.items.filter(i => i.id !== itemId); addLog(`${selectedCharacter.name} が ${item.name}(${item.quantity}個) を売却し、共有財産が ${totalSellValue}G 増えました。`); updateFirebase(); } }
+        function handleUpdateSharedMoney(newMoneyStr) { const newMoney = Number(Math.floor(newMoneyStr)); if (isNaN(newMoney) || newMoney < 0) { state.editingSharedMoney = false; render(); return; } if (state.sharedAssets.money !== newMoney) { addLog(`共有財産が ${state.sharedAssets.money}G から ${newMoney}G に変更されました。`); state.sharedAssets.money = newMoney; } state.editingSharedMoney = false; updateFirebase(); }
+        function handleToggleHolder(holderType) { const selectedCharacter = getSelectedCharacter(); if (!selectedCharacter) return; selectedCharacter[holderType] = !selectedCharacter[holderType]; updateFirebase(); }
+        function handleMoveItem(targetCharacterId) { const sourceCharacter = getSelectedCharacter(); const targetCharacter = state.characters.find(c => c.id === targetCharacterId); if (!state.moveItemData || !targetCharacter) return; const itemToMove = state.moveItemData.item; sourceCharacter.items = sourceCharacter.items.filter(i => i.id !== itemToMove.id); if (!targetCharacter.items) targetCharacter.items = []; targetCharacter.items.push({ ...itemToMove }); addLog(`${sourceCharacter.name}が${itemToMove.name}(${itemToMove.quantity}個)を${targetCharacter.name}に渡しました。`); state.showMoveModal = false; state.moveItemData = null; updateFirebase(); }
+        function handleDeleteLog(logId) { if (!window.confirm('このログを削除しますか？')) return; state.logs = state.logs.filter(log => log.id !== logId); updateFirebase(); }
+        function handleClearAllLogs() { if (!window.confirm('全てのログを削除しますか？')) return; state.logs = []; updateFirebase(); }
 
         // === UI描画関数 ===
         function render() {
@@ -183,7 +153,10 @@
             let sortedItems = [];
             if (selectedCharacter && selectedCharacter.items) {
                 sortedItems = [...selectedCharacter.items].sort((a, b) => {
-                    const key = state.sort.key; const order = state.sort.order === 'asc' ? 1 : -1; const valA = a[key]; const valB = b[key];
+                    const key = state.sort.key;
+                    const order = state.sort.order === 'asc' ? 1 : -1;
+                    const valA = a[key];
+                    const valB = b[key];
                     if (typeof valA === 'number' && typeof valB === 'number') { return (valA - valB) * order; }
                     if (typeof valA === 'string' && typeof valB === 'string') { return valA.localeCompare(valB) * order; }
                     return 0;
@@ -191,55 +164,141 @@
             }
 
             appContainer.innerHTML = `
-                <div class="max-w-7xl mx-auto"> <h1 class="text-4xl font-bold text-center mb-8 text-stone-700"> アリアンロッド2E アイテム管理ツール </h1> <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6"> <div> <div class="bg-stone-50 rounded-lg shadow-md p-6 mb-6"> <div class="flex justify-between items-center mb-4"> <h2 class="text-xl font-semibold text-stone-800">キャラクター一覧</h2> <button onclick="state.showCharacterModal = true; render();" class="bg-sky-700 hover:bg-sky-800 text-white px-3 py-1 rounded-md flex items-center gap-1"> ${icons.plus} 追加 </button> </div> <div class="space-y-2"> ${ (state.characters || []).map(character => { const weight = calculateCurrentWeight(character); const isOver = weight > character.maxWeight; const isSelected = character.id === state.selectedCharacterId; return `<div draggable="true" ondragstart="handleDragStart(${character.id}, event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(${character.id}, event)" ondragend="handleDragEnd(event)" onclick="state.selectedCharacterId = ${character.id}; updateFirebase()" class="p-3 rounded transition-colors flex items-center gap-2 ${isSelected ? 'bg-sky-100 border-sky-300' : 'bg-stone-100 hover:bg-stone-200'} ${isOver ? 'bg-red-100 border-red-300' : 'border border-stone-200'}"> <div>${icons.grip}</div> <div class="flex-grow"> <div class="flex justify-between items-center"> <div class="font-medium text-lg text-stone-800">${character.name}</div> <div class="flex items-center gap-1"> <button onclick="openEditCharacterModal(${character.id}, event)" class="text-sky-700 hover:text-sky-900 p-1 rounded-full hover:bg-sky-100 opacity-50 hover:opacity-100 transition-opacity" title="携帯可能重量を編集"> ${icons.edit} </button> <button onclick="handleDeleteCharacter(${character.id}, event)" class="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-100 opacity-50 hover:opacity-100 transition-opacity" title="${character.name}を削除"> ${icons.trash} </button> </div> </div> <div class="text-base ${isOver ? 'text-red-600 font-semibold' : 'text-stone-600'}"> ${Math.floor(weight)} / ${Math.floor(character.maxWeight)} ${isOver ? '(超過!)' : ''} </div> </div> </div>`; }).join('')} </div> </div> <div class="bg-stone-50 rounded-lg shadow-md p-6"> <h2 class="text-xl font-semibold mb-2 text-stone-800">共有財産</h2> <div class="text-3xl font-bold text-amber-600"> ${state.editingSharedMoney ? `<input type="number" value="${state.sharedAssets.money || 0}" class="w-full text-right border rounded px-2 py-1" onblur="handleUpdateSharedMoney(this.value)" onkeydown="if(event.key === 'Enter') this.blur(); if(event.key === 'Escape') { state.editingSharedMoney = false; render(); }" autofocus onfocus="this.select()">` : `<span onclick="state.editingSharedMoney = true; render();" class="cursor-pointer hover:bg-stone-200 px-2 py-1 rounded">${state.sharedAssets.money || 0} G</span>`} </div> </div> </div> <div class="lg:col-span-2 bg-stone-50 rounded-lg shadow-md p-6"> ${selectedCharacter ? ` <div class="flex flex-wrap justify-between items-center mb-4 gap-4"> <div> <h2 class="text-2xl font-semibold text-stone-800">${selectedCharacter.name}の所持品</h2> <p class="text-base ${isOverWeight ? 'text-red-600 font-semibold' : 'text-stone-600'}"> 現在重量: ${Math.floor(currentWeight)} / ${Math.floor(selectedCharacter.maxWeight)} ${isOverWeight ? '(超過!)' : ''} </p> </div> <button onclick="state.showItemModal = true; render();" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md flex items-center gap-2"> ${icons.plus} アイテム追加 </button> </div> <div class="mb-4 p-3 bg-stone-100 rounded-lg border border-stone-200"> <h3 class="font-semibold mb-2 text-stone-700">特殊アイテム</h3> <div class="flex flex-wrap gap-2"> <button onclick="handleToggleHolder('hasWeaponCase')" class="px-3 py-1 text-sm rounded-full transition-colors text-white ${selectedCharacter.hasWeaponCase ? 'bg-indigo-500 hover:bg-indigo-600' : 'bg-gray-400 hover:bg-gray-500'}"> ウェポンケース ${selectedCharacter.hasWeaponCase ? 'ON' : 'OFF'} </button> <button onclick="handleToggleHolder('hasPotionHolder')" class="px-3 py-1 text-sm rounded-full transition-colors text-white ${selectedCharacter.hasPotionHolder ? 'bg-sky-500 hover:bg-sky-600' : 'bg-gray-400 hover:bg-gray-500'}"> ポーションホルダー ${selectedCharacter.hasPotionHolder ? 'ON' : 'OFF'} </button> <button onclick="handleToggleHolder('hasLunchBox')" class="px-3 py-1 text-sm rounded-full transition-colors text-white ${selectedCharacter.hasLunchBox ? 'bg-amber-500 hover:bg-amber-600' : 'bg-gray-400 hover:bg-gray-500'}"> ランチボックス ${selectedCharacter.hasLunchBox ? 'ON' : 'OFF'} </button> <button onclick="handleToggleHolder('hasToolPouch')" class="px-3 py-1 text-sm rounded-full transition-colors text-white ${selectedCharacter.hasToolPouch ? 'bg-teal-500 hover:bg-teal-600' : 'bg-gray-400 hover:bg-gray-500'}"> 小道具入れ ${selectedCharacter.hasToolPouch ? 'ON' : 'OFF'} </button> <button onclick="handleToggleHolder('hasQuiver')" class="px-3 py-1 text-sm rounded-full transition-colors text-white ${selectedCharacter.hasQuiver ? 'bg-orange-500 hover:bg-orange-600' : 'bg-gray-400 hover:bg-gray-500'}"> 矢筒 ${selectedCharacter.hasQuiver ? 'ON' : 'OFF'} </button> </div> </div> <div class="overflow-x-auto"> <table class="w-full border-collapse border border-stone-300"> <thead> <tr class="bg-stone-100"> <th class="border border-stone-300 px-4 py-2 text-left"><button onclick="handleSortItems('name')" class="font-bold w-full text-left text-stone-700">アイテム名 ${state.sort.key === 'name' ? (state.sort.order === 'asc' ? '▲' : '▼') : ''}</button></th> <th class="border border-stone-300 px-2 py-2 text-left"><button onclick="handleSortItems('type')" class="font-bold w-full text-left text-stone-700">種類 ${state.sort.key === 'type' ? (state.sort.order === 'asc' ? '▲' : '▼') : ''}</button></th> <th class="border border-stone-300 px-2 py-2 text-right"><button onclick="handleSortItems('weight')" class="font-bold w-full text-right text-stone-700">重量 ${state.sort.key === 'weight' ? (state.sort.order === 'asc' ? '▲' : '▼') : ''}</button></th> <th class="border border-stone-300 px-2 py-2 text-right"><button onclick="handleSortItems('quantity')" class="font-bold w-full text-right text-stone-700">個数 ${state.sort.key === 'quantity' ? (state.sort.order === 'asc' ? '▲' : '▼') : ''}</button></th> <th class="border border-stone-300 px-3 py-2 text-right"><button onclick="handleSortItems('sellPrice')" class="font-bold w-full text-right text-stone-700">売却額 ${state.sort.key === 'sellPrice' ? (state.sort.order === 'asc' ? '▲' : '▼') : ''}</button></th> <th class="border border-stone-300 px-3 py-2 text-center text-stone-700">操作</th> </tr> </thead> <tbody> ${sortedItems.map(item => ` <tr class="hover:bg-stone-100"> <td class="border border-stone-300 px-4 py-2">${item.name}</td> <td class="border border-stone-300 px-2 py-2"> ${state.editingItemField.id === item.id && state.editingItemField.field === 'type' ? ` <select class="w-full border rounded px-1" onchange="handleUpdateItemField(${item.id}, 'type', this.value)" onblur="state.editingItemField = {id: null, field: null}; render();" autofocus> <option value="武器" ${item.type === '武器' ? 'selected' : ''}>武器</option> <option value="ポーション" ${item.type === 'ポーション' ? 'selected' : ''}>ポーション</option> <option value="食料" ${item.type === '食料' ? 'selected' : ''}>食料</option> <option value="道具" ${item.type === '道具' ? 'selected' : ''}>道具</option> <option value="矢弾" ${item.type === '矢弾' ? 'selected' : ''}>矢弾</option> <option value="その他" ${item.type === 'その他' ? 'selected' : ''}>その他</option> </select> ` : `<span onclick="state.editingItemField = {id: ${item.id}, field: 'type'}; render();" class="cursor-pointer hover:bg-stone-200 px-1 rounded">${item.type}</span>`} </td> <td class="border border-stone-300 px-2 py-2 text-right"> ${state.editingItemField.id === item.id && state.editingItemField.field === 'weight' ? `<input type="number" value="${item.weight}" class="w-16 text-right border rounded px-1" onblur="handleUpdateItemField(${item.id}, 'weight', this.value)" onkeydown="if(event.key === 'Enter') this.blur()" autofocus onfocus="this.select()">` : `<span onclick="state.editingItemField = {id: ${item.id}, field: 'weight'}; render();" class="cursor-pointer hover:bg-stone-200 px-1 rounded">${item.weight}</span>`} </td> <td class="border border-stone-300 px-2 py-2 text-right"> ${state.editingItemField.id === item.id && state.editingItemField.field === 'quantity' ? `<input type="number" value="${item.quantity}" class="w-16 text-right border rounded px-1" onblur="handleUpdateItemField(${item.id}, 'quantity', this.value)" onkeydown="if(event.key === 'Enter') this.blur()" autofocus onfocus="this.select()">` : `<span onclick="state.editingItemField = {id: ${item.id}, field: 'quantity'}; render();" class="cursor-pointer hover:bg-stone-200 px-1 rounded">${item.quantity}</span>`} </td> <td class="border border-stone-300 px-3 py-2 text-right"> ${state.editingItemField.id === item.id && state.editingItemField.field === 'sellPrice' ? `<input type="number" value="${item.sellPrice}" class="w-20 text-right border rounded px-1" onblur="handleUpdateItemField(${item.id}, 'sellPrice', this.value)" onkeydown="if(event.key === 'Enter') this.blur()" autofocus onfocus="this.select()">` : `<span onclick="state.editingItemField = {id: ${item.id}, field: 'sellPrice'}; render();" class="cursor-pointer hover:bg-stone-200 px-1 rounded">${item.sellPrice}</span>`} </td> <td class="border border-stone-300 px-3 py-2"> <div class="flex gap-1 justify-center"> <button onclick="openUseItemModal(${item.id})" class="bg-green-600 hover:bg-green-700 text-white p-1 rounded" title="使用"> ${icons.use} </button> <button onclick="handleSellItem(${item.id})" class="bg-amber-500 hover:bg-amber-600 text-white p-1 rounded" title="売却"> ${icons.coin} </button> <button onclick='state.moveItemData = { item: ${JSON.stringify(item)} }; state.showMoveModal = true; render();' class="bg-sky-700 hover:bg-sky-800 text-white p-1 rounded" title="移動">${icons.arrowRight}</button> <button onclick="handleDeleteItem(${item.id})" class="bg-red-500 hover:bg-red-600 text-white p-1 rounded" title="削除（破棄）">${icons.trash}</button> </div> </td> </tr> `).join('')} </tbody> </table> </div> ` : `<div class="text-center text-stone-500 py-12">キャラクターを選択してください</div>`} </div> </div> <div class="bg-stone-50 rounded-lg shadow-md p-6"> <div class="flex justify-between items-center mb-4"> <h2 class="text-xl font-semibold text-stone-800">アクションログ</h2> ${(state.logs && state.logs.length > 0) ? `<button onclick="handleClearAllLogs()" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm flex items-center gap-1">${icons.trash} 全削除</button>` : ''} </div> <div class="max-h-64 overflow-y-auto border border-stone-300 rounded p-4 bg-stone-100"> ${(!state.logs || state.logs.length === 0) ? `<p class="text-stone-500 text-center">まだログがありません</p>` : `<div class="space-y-1">${state.logs.map(log => `<div class="text-sm flex justify-between items-center hover:bg-stone-200 px-2 py-1 rounded group"><div><span class="text-stone-500">${log.timestamp}</span><span class="mx-2">|</span><span>${log.message}</span></div><button onclick="handleDeleteLog(${log.id})" class="opacity-0 group-hover:opacity-100 bg-red-500 hover:bg-red-600 text-white p-1 rounded transition-opacity" title="このログを削除"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button></div>`).join('')}</div>`} </div> </div> </div>
+                <div class="max-w-7xl mx-auto">
+                    <h1 class="text-4xl font-bold text-center mb-8 text-stone-700">
+                        アリアンロッド2E アイテム管理ツール
+                    </h1>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                        <div>
+                            <div class="bg-stone-50 rounded-lg shadow-md p-6 mb-6">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h2 class="text-xl font-semibold text-stone-800">キャラクター一覧</h2>
+                                    <button onclick="state.showCharacterModal = true; render();" class="bg-sky-700 hover:bg-sky-800 text-white px-3 py-1 rounded-md flex items-center gap-1"> ${icons.plus} 追加 </button>
+                                </div>
+                                <div class="space-y-2">
+                                    ${ (state.characters || []).map(character => {
+                                        const weight = calculateCurrentWeight(character);
+                                        const isOver = weight > character.maxWeight;
+                                        const isSelected = character.id === state.selectedCharacterId;
+                                        return `<div draggable="true" ondragstart="handleDragStart(${character.id}, event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(${character.id}, event)" ondragend="handleDragEnd(event)" onclick="state.selectedCharacterId = ${character.id}; updateFirebase()" class="p-3 rounded transition-colors flex items-center gap-2 ${isSelected ? 'bg-sky-100 border-sky-300' : 'bg-stone-100 hover:bg-stone-200'} ${isOver ? 'bg-red-100 border-red-300' : 'border border-stone-200'}"> <div>${icons.grip}</div> <div class="flex-grow"> <div class="flex justify-between items-center"> <div class="font-medium text-lg text-stone-800">${character.name}</div> <div class="flex items-center gap-1"> <button onclick="openEditCharacterModal(${character.id}, event)" class="text-sky-700 hover:text-sky-900 p-1 rounded-full hover:bg-sky-100 opacity-50 hover:opacity-100 transition-opacity" title="携帯可能重量を編集"> ${icons.edit} </button> <button onclick="handleDeleteCharacter(${character.id}, event)" class="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-100 opacity-50 hover:opacity-100 transition-opacity" title="${character.name}を削除"> ${icons.trash} </button> </div> </div> <div class="text-base ${isOver ? 'text-red-600 font-semibold' : 'text-stone-600'}"> ${Math.floor(weight)} / ${Math.floor(character.maxWeight)} ${isOver ? '(超過!)' : ''} </div> </div> </div>`;
+                                    }).join('')}
+                                </div>
+                            </div>
+                            <div class="bg-stone-50 rounded-lg shadow-md p-6">
+                                <h2 class="text-xl font-semibold mb-2 text-stone-800">共有財産</h2>
+                                <div class="text-3xl font-bold text-amber-600">
+                                    ${state.editingSharedMoney ? `<input type="number" value="${state.sharedAssets.money || 0}" class="w-full text-right border rounded px-2 py-1" onblur="handleUpdateSharedMoney(this.value)" onkeydown="if(event.key === 'Enter') this.blur(); if(event.key === 'Escape') { state.editingSharedMoney = false; render(); }" autofocus onfocus="this.select()">` : `<span onclick="state.editingSharedMoney = true; render();" class="cursor-pointer hover:bg-stone-200 px-2 py-1 rounded">${state.sharedAssets.money || 0} G</span>`}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="lg:col-span-2 bg-stone-50 rounded-lg shadow-md p-6">
+                            ${selectedCharacter ? `
+                                <div class="flex flex-wrap justify-between items-center mb-4 gap-4">
+                                    <div> <h2 class="text-2xl font-semibold text-stone-800">${selectedCharacter.name}の所持品</h2> <p class="text-base ${isOverWeight ? 'text-red-600 font-semibold' : 'text-stone-600'}"> 現在重量: ${Math.floor(currentWeight)} / ${Math.floor(selectedCharacter.maxWeight)} ${isOverWeight ? '(超過!)' : ''} </p> </div>
+                                    <button onclick="state.showItemModal = true; render();" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md flex items-center gap-2"> ${icons.plus} アイテム追加 </button>
+                                </div>
+                                <div class="mb-4 p-3 bg-stone-100 rounded-lg border border-stone-200">
+                                     <h3 class="font-semibold mb-2 text-stone-700">特殊アイテム</h3>
+                                     <div class="flex flex-wrap gap-2">
+                                        <button onclick="handleToggleHolder('hasWeaponCase')" class="px-3 py-1 text-sm rounded-full transition-colors text-white ${selectedCharacter.hasWeaponCase ? 'bg-indigo-500 hover:bg-indigo-600' : 'bg-gray-400 hover:bg-gray-500'}"> ウェポンケース ${selectedCharacter.hasWeaponCase ? 'ON' : 'OFF'} </button>
+                                        <button onclick="handleToggleHolder('hasPotionHolder')" class="px-3 py-1 text-sm rounded-full transition-colors text-white ${selectedCharacter.hasPotionHolder ? 'bg-sky-500 hover:bg-sky-600' : 'bg-gray-400 hover:bg-gray-500'}"> ポーションホルダー ${selectedCharacter.hasPotionHolder ? 'ON' : 'OFF'} </button>
+                                        <button onclick="handleToggleHolder('hasLunchBox')" class="px-3 py-1 text-sm rounded-full transition-colors text-white ${selectedCharacter.hasLunchBox ? 'bg-amber-500 hover:bg-amber-600' : 'bg-gray-400 hover:bg-gray-500'}"> ランチボックス ${selectedCharacter.hasLunchBox ? 'ON' : 'OFF'} </button>
+                                        <button onclick="handleToggleHolder('hasToolPouch')" class="px-3 py-1 text-sm rounded-full transition-colors text-white ${selectedCharacter.hasToolPouch ? 'bg-teal-500 hover:bg-teal-600' : 'bg-gray-400 hover:bg-gray-500'}"> 小道具入れ ${selectedCharacter.hasToolPouch ? 'ON' : 'OFF'} </button>
+                                        <button onclick="handleToggleHolder('hasQuiver')" class="px-3 py-1 text-sm rounded-full transition-colors text-white ${selectedCharacter.hasQuiver ? 'bg-orange-500 hover:bg-orange-600' : 'bg-gray-400 hover:bg-gray-500'}"> 矢筒 ${selectedCharacter.hasQuiver ? 'ON' : 'OFF'} </button>
+                                     </div>
+                                </div>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full border-collapse border border-stone-300">
+                                        <thead>
+                                            <tr class="bg-stone-100">
+                                                <th class="border border-stone-300 px-4 py-2 text-left"><button onclick="handleSortItems('name')" class="font-bold w-full text-left text-stone-700">アイテム名 ${state.sort.key === 'name' ? (state.sort.order === 'asc' ? '▲' : '▼') : ''}</button></th>
+                                                <th class="border border-stone-300 px-2 py-2 text-left"><button onclick="handleSortItems('type')" class="font-bold w-full text-left text-stone-700">種類 ${state.sort.key === 'type' ? (state.sort.order === 'asc' ? '▲' : '▼') : ''}</button></th>
+                                                <th class="border border-stone-300 px-2 py-2 text-right"><button onclick="handleSortItems('weight')" class="font-bold w-full text-right text-stone-700">重量 ${state.sort.key === 'weight' ? (state.sort.order === 'asc' ? '▲' : '▼') : ''}</button></th>
+                                                <th class="border border-stone-300 px-2 py-2 text-right"><button onclick="handleSortItems('quantity')" class="font-bold w-full text-right text-stone-700">個数 ${state.sort.key === 'quantity' ? (state.sort.order === 'asc' ? '▲' : '▼') : ''}</button></th>
+                                                <th class="border border-stone-300 px-3 py-2 text-right"><button onclick="handleSortItems('sellPrice')" class="font-bold w-full text-right text-stone-700">売却額 ${state.sort.key === 'sellPrice' ? (state.sort.order === 'asc' ? '▲' : '▼') : ''}</button></th>
+                                                <th class="border border-stone-300 px-3 py-2 text-center text-stone-700">操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            ${sortedItems.map(item => `
+                                                <tr class="hover:bg-stone-100">
+                                                    <td class="border border-stone-300 px-4 py-2">${item.name}</td>
+                                                    <!-- ★変更点: 各セルをクリックで編集できるように -->
+                                                    <td class="border border-stone-300 px-2 py-2">
+                                                        ${state.editingItemField.id === item.id && state.editingItemField.field === 'type' ? `
+                                                            <select class="w-full border rounded px-1" onchange="handleUpdateItemField(${item.id}, 'type', this.value)" onblur="state.editingItemField = {id: null, field: null}; render();" autofocus>
+                                                                <option value="武器" ${item.type === '武器' ? 'selected' : ''}>武器</option>
+                                                                <option value="ポーション" ${item.type === 'ポーション' ? 'selected' : ''}>ポーション</option>
+                                                                <option value="食料" ${item.type === '食料' ? 'selected' : ''}>食料</option>
+                                                                <option value="道具" ${item.type === '道具' ? 'selected' : ''}>道具</option>
+                                                                <option value="矢弾" ${item.type === '矢弾' ? 'selected' : ''}>矢弾</option>
+                                                                <option value="その他" ${item.type === 'その他' ? 'selected' : ''}>その他</option>
+                                                            </select>
+                                                        ` : `<span onclick="state.editingItemField = {id: ${item.id}, field: 'type'}; render();" class="cursor-pointer hover:bg-stone-200 px-1 rounded">${item.type}</span>`}
+                                                    </td>
+                                                    <td class="border border-stone-300 px-2 py-2 text-right">
+                                                        ${state.editingItemField.id === item.id && state.editingItemField.field === 'weight' ? `<input type="number" value="${item.weight}" class="w-16 text-right border rounded px-1" onblur="handleUpdateItemField(${item.id}, 'weight', this.value)" onkeydown="if(event.key === 'Enter') this.blur()" autofocus onfocus="this.select()">` : `<span onclick="state.editingItemField = {id: ${item.id}, field: 'weight'}; render();" class="cursor-pointer hover:bg-stone-200 px-1 rounded">${item.weight}</span>`}
+                                                    </td>
+                                                    <td class="border border-stone-300 px-2 py-2 text-right">
+                                                        ${state.editingItemField.id === item.id && state.editingItemField.field === 'quantity' ? `<input type="number" value="${item.quantity}" class="w-16 text-right border rounded px-1" onblur="handleUpdateItemField(${item.id}, 'quantity', this.value)" onkeydown="if(event.key === 'Enter') this.blur()" autofocus onfocus="this.select()">` : `<span onclick="state.editingItemField = {id: ${item.id}, field: 'quantity'}; render();" class="cursor-pointer hover:bg-stone-200 px-1 rounded">${item.quantity}</span>`}
+                                                    </td>
+                                                    <td class="border border-stone-300 px-3 py-2 text-right">
+                                                        ${state.editingItemField.id === item.id && state.editingItemField.field === 'sellPrice' ? `<input type="number" value="${item.sellPrice}" class="w-20 text-right border rounded px-1" onblur="handleUpdateItemField(${item.id}, 'sellPrice', this.value)" onkeydown="if(event.key === 'Enter') this.blur()" autofocus onfocus="this.select()">` : `<span onclick="state.editingItemField = {id: ${item.id}, field: 'sellPrice'}; render();" class="cursor-pointer hover:bg-stone-200 px-1 rounded">${item.sellPrice}</span>`}
+                                                    </td>
+                                                    <td class="border border-stone-300 px-3 py-2">
+                                                        <div class="flex gap-1 justify-center">
+                                                            <button onclick="handleSellItem(${item.id})" class="bg-amber-500 hover:bg-amber-600 text-white p-1 rounded" title="売却"> ${icons.coin} </button>
+                                                            <button onclick='state.moveItemData = { item: ${JSON.stringify(item)} }; state.showMoveModal = true; render();' class="bg-sky-700 hover:bg-sky-800 text-white p-1 rounded" title="移動">${icons.arrowRight}</button>
+                                                            <button onclick="handleDeleteItem(${item.id})" class="bg-red-500 hover:bg-red-600 text-white p-1 rounded" title="削除（破棄）">${icons.trash}</button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            `).join('')}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            ` : `<div class="text-center text-stone-500 py-12">キャラクターを選択してください</div>`}
+                        </div>
+                    </div>
+                    <div class="bg-stone-50 rounded-lg shadow-md p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-xl font-semibold text-stone-800">アクションログ</h2>
+                            ${(state.logs && state.logs.length > 0) ? `<button onclick="handleClearAllLogs()" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm flex items-center gap-1">${icons.trash} 全削除</button>` : ''}
+                        </div>
+                        <div class="max-h-64 overflow-y-auto border border-stone-300 rounded p-4 bg-stone-100">
+                            ${(!state.logs || state.logs.length === 0) ? `<p class="text-stone-500 text-center">まだログがありません</p>` : `<div class="space-y-1">${state.logs.map(log => `<div class="text-sm flex justify-between items-center hover:bg-stone-200 px-2 py-1 rounded group"><div><span class="text-stone-500">${log.timestamp}</span><span class="mx-2">|</span><span>${log.message}</span></div><button onclick="handleDeleteLog(${log.id})" class="opacity-0 group-hover:opacity-100 bg-red-500 hover:bg-red-600 text-white p-1 rounded transition-opacity" title="このログを削除"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button></div>`).join('')}</div>`}
+                        </div>
+                    </div>
+                </div>
                 ${renderModals()}
             `;
         }
         
         function renderModals() {
             let modalHTML = '';
-            if (state.showCharacterModal) { /* ... */ }
-            if (state.showItemModal) { /* ... */ }
-            if (state.showMoveModal) { /* ... */ }
-            if (state.showEditCharacterModal) { /* ... */ }
-
-            // (省略したモーダル描画コードをここにペースト)
-            if (state.showCharacterModal) { modalHTML += ` <div class="modal-overlay"> <div class="bg-stone-50 p-6 rounded-lg w-96"> <h3 class="text-lg font-semibold mb-4 text-stone-800">キャラクター追加</h3> <div class="space-y-4"> <div> <label class="block text-sm font-medium mb-1 text-stone-700">キャラクター名</label> <input type="text" value="${state.characterForm.name}" oninput="state.characterForm.name = this.value" class="w-full border border-stone-300 rounded px-3 py-2"> </div> <div> <label class="block text-sm font-medium mb-1 text-stone-700">携帯可能重量</label> <input type="number" min="0" value="${state.characterForm.maxWeight}" oninput="state.characterForm.maxWeight = Number(this.value)" class="w-full border border-stone-300 rounded px-3 py-2"> </div> </div> <div class="flex justify-end space-x-2 mt-6"> <button onclick="state.showCharacterModal = false; render();" class="px-4 py-2 border border-stone-300 rounded hover:bg-stone-100">キャンセル</button> <button onclick="handleAddCharacter()" class="px-4 py-2 bg-sky-700 text-white rounded hover:bg-sky-800">追加</button> </div> </div> </div> `; }
-            if (state.showItemModal) { modalHTML += ` <div class="modal-overlay"> <div class="bg-stone-50 p-6 rounded-lg w-96"> <h3 class="text-lg font-semibold mb-4 text-stone-800">アイテム追加</h3> <div class="space-y-4"> <div> <label class="block text-sm font-medium mb-1 text-stone-700">アイテム名</label> <input type="text" value="${state.itemForm.name}" oninput="state.itemForm.name = this.value" class="w-full border border-stone-300 rounded px-3 py-2"> </div> <div class="grid grid-cols-2 gap-4"> <div> <label class="block text-sm font-medium mb-1 text-stone-700">重量</label> <input type="number" min="0" step="1" value="${state.itemForm.weight}" oninput="this.value = Math.floor(this.value || 0); state.itemForm.weight = Number(this.value);" class="w-full border border-stone-300 rounded px-3 py-2"/> </div> <div> <label class="block text-sm font-medium mb-1 text-stone-700">個数</label> <input type="number" min="1" value="${state.itemForm.quantity}" oninput="state.itemForm.quantity = Number(this.value)" class="w-full border border-stone-300 rounded px-3 py-2"/> </div> </div> <div> <label class="block text-sm font-medium mb-1 text-stone-700">売却金額</label> <input type="number" min="0" value="${state.itemForm.sellPrice}" oninput="state.itemForm.sellPrice = Number(this.value)" class="w-full border border-stone-300 rounded px-3 py-2"/> </div> <div> <label class="block text-sm font-medium mb-1 text-stone-700">種類</label> <select onchange="state.itemForm.type = this.value" class="w-full border border-stone-300 rounded px-3 py-2"> <option value="武器" ${state.itemForm.type === '武器' ? 'selected' : ''}>武器</option> <option value="ポーション" ${state.itemForm.type === 'ポーション' ? 'selected' : ''}>ポーション</option> <option value="食料" ${state.itemForm.type === '食料' ? 'selected' : ''}>食料</option> <option value="道具" ${state.itemForm.type === '道具' ? 'selected' : ''}>道具</option> <option value="矢弾" ${state.itemForm.type === '矢弾' ? 'selected' : ''}>矢弾</option> <option value="その他" ${state.itemForm.type === 'その他' ? 'selected' : ''}>その他</option> </select> </div> </div> <div class="flex justify-end space-x-2 mt-6"> <button onclick="state.showItemModal = false; render();" class="px-4 py-2 border border-stone-300 rounded hover:bg-stone-100">キャンセル</button> <button onclick="handleAddItem()" class="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700">追加</button> </div> </div> </div> `; }
-            if (state.showMoveModal && state.moveItemData) { modalHTML += ` <div class="modal-overlay"> <div class="bg-stone-50 p-6 rounded-lg w-96"> <h3 class="text-lg font-semibold mb-4 text-stone-800">アイテム移動</h3> <p class="mb-4 text-stone-700"><strong>${state.moveItemData.item.name}</strong> を誰に渡しますか？</p> <div class="space-y-2 mb-6"> ${state.characters.filter(c => c.id !== state.selectedCharacterId).map(character => `<button onclick="handleMoveItem(${character.id})" class="w-full text-left p-3 border border-stone-300 rounded hover:bg-stone-100"> ${character.name} </button>`).join('')} </div> <div class="flex justify-end"> <button onclick="state.showMoveModal = false; state.moveItemData = null; render();" class="px-4 py-2 border border-stone-300 rounded hover:bg-stone-100">キャンセル</button> </div> </div> </div> `; }
-            if (state.showEditCharacterModal) { const character = state.characters.find(c => c.id === state.editingCharacterId); if(character) { modalHTML += ` <div class="modal-overlay"> <div class="bg-stone-50 p-6 rounded-lg w-96"> <h3 class="text-lg font-semibold mb-4 text-stone-800">${character.name} の携帯可能重量を編集</h3> <div class="space-y-4"> <div> <label class="block text-sm font-medium mb-1 text-stone-700">新しい携帯可能重量</label> <input type="number" min="0" value="${state.editCharacterForm.maxWeight}" oninput="state.editCharacterForm.maxWeight = this.value" class="w-full border border-stone-300 rounded px-3 py-2" > </div> </div> <div class="flex justify-end space-x-2 mt-6"> <button onclick="state.showEditCharacterModal = false; state.editingCharacterId = null; render();" class="px-4 py-2 border border-stone-300 rounded hover:bg-stone-100">キャンセル</button> <button onclick="handleUpdateCharacterWeight()" class="px-4 py-2 bg-sky-700 text-white rounded hover:bg-sky-800">更新</button> </div> </div> </div> `; } }
-
-            // ★新設: アイテム使用モーダルの描画
-            if (state.showUseItemModal) {
-                const { name, maxQuantity, useQuantity } = state.useItemData;
+            if (state.showCharacterModal) {
                 modalHTML += `
-                    <div class="modal-overlay">
-                        <div class="bg-stone-50 p-6 rounded-lg w-96">
-                            <h3 class="text-lg font-semibold mb-4 text-stone-800">${name} を使用</h3>
-                            <div class="space-y-4">
-                                <div>
-                                    <label class="block text-sm font-medium mb-1 text-stone-700">使用する個数 (最大: ${maxQuantity})</label>
-                                    <input 
-                                        type="number" 
-                                        min="1"
-                                        max="${maxQuantity}"
-                                        value="${useQuantity}"
-                                        oninput="state.useItemData.useQuantity = Number(this.value)"
-                                        class="w-full border border-stone-300 rounded px-3 py-2"
-                                        autofocus
-                                        onfocus="this.select()"
-                                    >
-                                </div>
-                            </div>
-                            <div class="flex justify-end space-x-2 mt-6">
-                                <button onclick="state.showUseItemModal = false; render();" class="px-4 py-2 border border-stone-300 rounded hover:bg-stone-100">キャンセル</button>
-                                <button onclick="handleUseItem()" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">使用する</button>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="modal-overlay"> <div class="bg-stone-50 p-6 rounded-lg w-96"> <h3 class="text-lg font-semibold mb-4 text-stone-800">キャラクター追加</h3> <div class="space-y-4"> <div> <label class="block text-sm font-medium mb-1 text-stone-700">キャラクター名</label> <input type="text" value="${state.characterForm.name}" oninput="state.characterForm.name = this.value" class="w-full border border-stone-300 rounded px-3 py-2"> </div> <div> <label class="block text-sm font-medium mb-1 text-stone-700">携帯可能重量</label> <input type="number" min="0" value="${state.characterForm.maxWeight}" oninput="state.characterForm.maxWeight = Number(this.value)" class="w-full border border-stone-300 rounded px-3 py-2"> </div> </div> <div class="flex justify-end space-x-2 mt-6"> <button onclick="state.showCharacterModal = false; render();" class="px-4 py-2 border border-stone-300 rounded hover:bg-stone-100">キャンセル</button> <button onclick="handleAddCharacter()" class="px-4 py-2 bg-sky-700 text-white rounded hover:bg-sky-800">追加</button> </div> </div> </div>
                 `;
             }
-
+            if (state.showItemModal) {
+                modalHTML += `
+                     <div class="modal-overlay"> <div class="bg-stone-50 p-6 rounded-lg w-96"> <h3 class="text-lg font-semibold mb-4 text-stone-800">アイテム追加</h3> <div class="space-y-4"> <div> <label class="block text-sm font-medium mb-1 text-stone-700">アイテム名</label> <input type="text" value="${state.itemForm.name}" oninput="state.itemForm.name = this.value" class="w-full border border-stone-300 rounded px-3 py-2"> </div> <div class="grid grid-cols-2 gap-4"> <div> <label class="block text-sm font-medium mb-1 text-stone-700">重量</label> <input type="number" min="0" step="1" value="${state.itemForm.weight}" oninput="this.value = Math.floor(this.value || 0); state.itemForm.weight = Number(this.value);" class="w-full border border-stone-300 rounded px-3 py-2"/> </div> <div> <label class="block text-sm font-medium mb-1 text-stone-700">個数</label> <input type="number" min="1" value="${state.itemForm.quantity}" oninput="state.itemForm.quantity = Number(this.value)" class="w-full border border-stone-300 rounded px-3 py-2"/> </div> </div> <div> <label class="block text-sm font-medium mb-1 text-stone-700">売却金額</label> <input type="number" min="0" value="${state.itemForm.sellPrice}" oninput="state.itemForm.sellPrice = Number(this.value)" class="w-full border border-stone-300 rounded px-3 py-2"/> </div> <div> <label class="block text-sm font-medium mb-1 text-stone-700">種類</label> <select onchange="state.itemForm.type = this.value" class="w-full border border-stone-300 rounded px-3 py-2"> <option value="武器" ${state.itemForm.type === '武器' ? 'selected' : ''}>武器</option> <option value="ポーション" ${state.itemForm.type === 'ポーション' ? 'selected' : ''}>ポーション</option> <option value="食料" ${state.itemForm.type === '食料' ? 'selected' : ''}>食料</option> <option value="道具" ${state.itemForm.type === '道具' ? 'selected' : ''}>道具</option> <option value="矢弾" ${state.itemForm.type === '矢弾' ? 'selected' : ''}>矢弾</option> <option value="その他" ${state.itemForm.type === 'その他' ? 'selected' : ''}>その他</option> </select> </div> </div> <div class="flex justify-end space-x-2 mt-6"> <button onclick="state.showItemModal = false; render();" class="px-4 py-2 border border-stone-300 rounded hover:bg-stone-100">キャンセル</button> <button onclick="handleAddItem()" class="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700">追加</button> </div> </div> </div>
+                `;
+            }
+            if (state.showMoveModal && state.moveItemData) {
+                 modalHTML += `
+                    <div class="modal-overlay"> <div class="bg-stone-50 p-6 rounded-lg w-96"> <h3 class="text-lg font-semibold mb-4 text-stone-800">アイテム移動</h3> <p class="mb-4 text-stone-700"><strong>${state.moveItemData.item.name}</strong> を誰に渡しますか？</p> <div class="space-y-2 mb-6"> ${state.characters.filter(c => c.id !== state.selectedCharacterId).map(character => `<button onclick="handleMoveItem(${character.id})" class="w-full text-left p-3 border border-stone-300 rounded hover:bg-stone-100"> ${character.name} </button>`).join('')} </div> <div class="flex justify-end"> <button onclick="state.showMoveModal = false; state.moveItemData = null; render();" class="px-4 py-2 border border-stone-300 rounded hover:bg-stone-100">キャンセル</button> </div> </div> </div>
+                `;
+            }
+            if (state.showEditCharacterModal) {
+                const character = state.characters.find(c => c.id === state.editingCharacterId);
+                if(character) {
+                    modalHTML += `
+                        <div class="modal-overlay"> <div class="bg-stone-50 p-6 rounded-lg w-96"> <h3 class="text-lg font-semibold mb-4 text-stone-800">${character.name} の携帯可能重量を編集</h3> <div class="space-y-4"> <div> <label class="block text-sm font-medium mb-1 text-stone-700">新しい携帯可能重量</label> <input type="number" min="0" value="${state.editCharacterForm.maxWeight}" oninput="state.editCharacterForm.maxWeight = this.value" class="w-full border border-stone-300 rounded px-3 py-2" > </div> </div> <div class="flex justify-end space-x-2 mt-6"> <button onclick="state.showEditCharacterModal = false; state.editingCharacterId = null; render();" class="px-4 py-2 border border-stone-300 rounded hover:bg-stone-100">キャンセル</button> <button onclick="handleUpdateCharacterWeight()" class="px-4 py-2 bg-sky-700 text-white rounded hover:bg-sky-800">更新</button> </div> </div> </div>
+                    `;
+                }
+            }
             return modalHTML;
         }
 
@@ -249,4 +308,4 @@
         });
     </script>
 </body>
-</html>
+</html>```
