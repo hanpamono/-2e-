@@ -15,60 +15,48 @@
     <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Merriweather&display=swap" rel="stylesheet">
 
     <style>
-        /* 基本フォント設定 */
         body { font-family: 'Merriweather', serif; }
         h1, h2, h3, h4, h5, h6 { font-family: 'Cinzel Decorative', serif; letter-spacing: 0.1em; }
 
-        /* --- ★ライトテーマ (デザインを刷新) --- */
-        .theme-light, .theme-light html {
-            background-color: #f0f9ff; /* sky-50 */
-            color: #1f2937; /* gray-800 */
-        }
-        .theme-light .card-bg {
-            background-color: white;
-            border: 1px solid #e5e7eb; /* gray-200 */
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-        }
-        .theme-light .text-title { color: #1e40af; /* blue-800 */ }
-        .theme-light .text-body { color: #1f2937; /* gray-800 */ }
-        .theme-light .text-muted { color: #6b7280; /* gray-500 */ }
-        .theme-light .text-gold { color: #eab308; /* yellow-500 */ }
-        .theme-light .border-color { border-color: #e5e7eb; /* gray-200 */ }
-        .theme-light .hover-bg:hover { background-color: #f3f4f6; /* gray-100 */ }
-        .theme-light .btn-primary { background-color: #3b82f6; color: white; } /* blue-500 */
-        .theme-light .btn-primary:hover { background-color: #2563eb; } /* blue-600 */
-        .theme-light .btn-secondary { background-color: #84cc16; color: white; } /* lime-500 */
-        .theme-light .btn-secondary:hover { background-color: #65a30d; } /* lime-600 */
+        /* --- ライトテーマ --- */
+        .theme-light, .theme-light html { background-color: #f0f9ff; color: #1f2937; }
+        .theme-light .card-bg { background-color: white; border: 1px solid #e5e7eb; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); }
+        .theme-light .text-title { color: #1e40af; }
+        .theme-light .text-body { color: #1f2937; }
+        .theme-light .text-muted { color: #6b7280; }
+        .theme-light .text-gold { color: #eab308; }
+        .theme-light .border-color { border-color: #e5e7eb; }
+        .theme-light .hover-bg:hover { background-color: #f3f4f6; }
+        .theme-light .btn { border-color: rgba(0,0,0,0.1); }
+        .theme-light .btn:hover { border-color: rgba(0,0,0,0.2); }
+        .theme-light .btn-primary { background-color: #3b82f6; color: white; }
+        .theme-light .btn-primary:hover { background-color: #2563eb; }
+        .theme-light .btn-secondary { background-color: #84cc16; color: white; }
+        .theme-light .btn-secondary:hover { background-color: #65a30d; }
         .theme-light .input-bg { background-color: white; border-color: #d1d5db; color: #1f2937; }
         .theme-light .input-bg:focus { border-color: #3b82f6; box-shadow: 0 0 0 1px #3b82f6; outline:none; }
+        .theme-light .selected-row { background-color: #eff6ff; } /* blue-50 */
 
-        /* --- ★ダークテーマ --- */
+        /* --- ダークテーマ --- */
         .theme-dark, .theme-dark html { background-color: #171717; }
-        .theme-dark {
-            background-image: url('https://images.unsplash.com/photo-1549317336-206569e8ad8f?q=80&w=2574&auto=format&fit=crop');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            color: #e5e7eb;
-        }
-        .theme-dark .card-bg {
-            background-color: rgba(23, 23, 23, 0.85);
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(212, 175, 55, 0.3);
-        }
+        .theme-dark { background-image: url('https://images.unsplash.com/photo-1549317336-206569e8ad8f?q=80&w=2574&auto=format&fit=crop'); background-size: cover; background-position: center; background-attachment: fixed; color: #e5e7eb; }
+        .theme-dark .card-bg { background-color: rgba(23, 23, 23, 0.85); backdrop-filter: blur(5px); border: 1px solid rgba(212, 175, 55, 0.3); }
         .theme-dark .text-title { color: #fcd34d; }
         .theme-dark .text-body { color: #e5e7eb; }
         .theme-dark .text-muted { color: #9ca3af; }
         .theme-dark .text-gold { color: #fbbf24; }
         .theme-dark .border-color { border-color: rgba(212, 175, 55, 0.2); }
         .theme-dark .hover-bg:hover { background-color: rgba(255,255,255,0.1); }
+        .theme-dark .btn { border-color: rgba(212, 175, 55, 0.6); }
+        .theme-dark .btn:hover { border-color: rgba(222, 185, 65, 0.9); }
         .theme-dark .btn-primary { background-color: #0369a1; color: white; }
         .theme-dark .btn-primary:hover { background-color: #0284c7; }
         .theme-dark .btn-secondary { background-color: #059669; color: white; }
         .theme-dark .btn-secondary:hover { background-color: #10b981; }
         .theme-dark .input-bg { background-color: rgba(0,0,0,0.3); border-color: rgba(212, 175, 55, 0.3); color: #e5e7eb; }
         .theme-dark .input-bg:focus { border-color: #fcd34d; outline:none; }
-
+        .theme-dark .selected-row { background-color: rgba(251, 191, 36, 0.15); } /* amber-400 with opacity */
+        
         /* 共通スタイル */
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.7); display: flex; align-items: center; justify-content: center; z-index: 50; backdrop-filter: blur(4px); }
         .dragging { opacity: 0.5; }
@@ -121,9 +109,9 @@
         function handleDeleteLog(logId) { if (!window.confirm('このログを削除しますか？')) return; state.logs = state.logs.filter(log => log.id !== logId); updateFirebase(); }
         function handleClearAllLogs() { if (!window.confirm('全てのログを削除しますか？')) return; state.logs = []; updateFirebase(); }
         function handleUseItem(itemId) { const selectedCharacter = getSelectedCharacter(); const item = selectedCharacter?.items.find(i => i.id === itemId); if (!item) return; const message = `いくつ使用しますか？ (最大: ${item.quantity}個)`; const input = prompt(message, "1"); if (input === null) { return; } const amountToUse = Number(Math.floor(input)); if (isNaN(amountToUse) || amountToUse < 1) { alert("1以上の有効な数値を入力してください。"); return; } if (amountToUse > item.quantity) { alert(`使用できるのは最大 ${item.quantity}個までです。`); return; } item.quantity -= amountToUse; addLog(`${selectedCharacter.name}が「${item.name}」を ${amountToUse}個使用しました。`); if (item.quantity <= 0) { selectedCharacter.items = selectedCharacter.items.filter(i => i.id !== itemId); addLog(`「${item.name}」を使い切りました。`); } updateFirebase(); }
-        function handleToggleTheme() { state.theme = state.theme === 'dark' ? 'light' : 'dark'; localStorage.setItem('arianrod-theme', state.theme); document.body.className = `theme-${state.theme}`; }
+        function handleToggleTheme() { state.theme = state.theme === 'dark' ? 'light' : 'dark'; localStorage.setItem('arianrod-theme', state.theme); }
 
-        // === UI描画関数 (変更なし) ===
+        // === UI描画関数 ===
         function render() {
             document.body.className = `theme-${state.theme}`;
             const selectedCharacter = state.characters ? getSelectedCharacter() : null;
@@ -144,10 +132,10 @@
             appContainer.innerHTML = `
                 <div class="max-w-7xl mx-auto">
                     <div class="flex justify-between items-center mb-8">
-                        <h1 class="text-4xl md:text-5xl font-bold text-center text-title" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.4);">
+                        <h1 class="text-4xl md:text-5xl font-bold text-center text-title" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.2);">
                             アイテム管理ツール
                         </h1>
-                        <button onclick="handleToggleTheme()" class="btn bg-gray-500/20 hover:bg-gray-500/40 text-sm px-4 py-2 rounded-lg text-body">
+                        <button onclick="handleToggleTheme(); render()" class="btn bg-gray-500/10 hover:bg-gray-500/20 text-sm px-4 py-2 rounded-lg text-body">
                             ${state.theme === 'dark' ? 'ライトテーマへ' : 'ダークテーマへ'}
                         </button>
                     </div>
@@ -164,13 +152,13 @@
                                         const weight = calculateCurrentWeight(character);
                                         const isOver = weight > character.maxWeight;
                                         const isSelected = character.id === state.selectedCharacterId;
-                                        return `<div draggable="true" ondragstart="handleDragStart(${character.id}, event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(${character.id}, event)" ondragend="handleDragEnd(event)" onclick="state.selectedCharacterId = ${character.id}; render()" class="p-3 rounded-lg transition-all duration-200 flex items-center gap-3 ${isSelected ? 'bg-amber-500/20 border-amber-400' : 'bg-black/10 hover-bg'} ${isOver ? 'bg-red-900/60 border-red-500' : 'border-transparent'} border"> <div>${icons.grip}</div> <div class="flex-grow"> <div class="flex justify-between items-center"> <div class="font-bold text-xl text-body">${character.name}</div> <div class="flex items-center gap-1"> <button onclick="openEditCharacterModal(${character.id}, event)" class="text-sky-400 hover:text-sky-300 p-1 rounded-full hover-bg transition-colors" title="携帯可能重量を編集"> ${icons.edit} </button> <button onclick="handleDeleteCharacter(${character.id}, event)" class="text-red-400 hover:text-red-300 p-1 rounded-full hover-bg transition-colors" title="${character.name}を削除"> ${icons.trash} </button> </div> </div> <div class="text-lg ${isOver ? 'text-red-400 font-semibold' : 'text-muted'}"> ${Math.floor(weight)} / ${Math.floor(character.maxWeight)} ${isOver ? '(超過!)' : ''} </div> </div> </div>`;
+                                        return `<div draggable="true" ondragstart="handleDragStart(${character.id}, event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(${character.id}, event)" ondragend="handleDragEnd(event)" onclick="state.selectedCharacterId = ${character.id}; render()" class="p-3 rounded-lg transition-all duration-200 flex items-center gap-3 ${isSelected ? 'selected-row border-blue-500' : 'bg-black/5 hover-bg border-transparent'} ${isOver ? 'bg-red-500/10 border-red-500' : ''} border"> <div>${icons.grip}</div> <div class="flex-grow"> <div class="flex justify-between items-center"> <div class="font-bold text-xl text-body">${character.name}</div> <div class="flex items-center gap-1"> <button onclick="openEditCharacterModal(${character.id}, event)" class="text-sky-500 hover:text-sky-700 p-1 rounded-full hover-bg transition-colors" title="携帯可能重量を編集"> ${icons.edit} </button> <button onclick="handleDeleteCharacter(${character.id}, event)" class="text-red-500 hover:text-red-700 p-1 rounded-full hover-bg transition-colors" title="${character.name}を削除"> ${icons.trash} </button> </div> </div> <div class="text-lg ${isOver ? 'text-red-600 font-semibold' : 'text-muted'}"> ${Math.floor(weight)} / ${Math.floor(character.maxWeight)} ${isOver ? '(超過!)' : ''} </div> </div> </div>`;
                                     }).join('')}
                                 </div>
                             </div>
                             <div class="card-bg rounded-lg shadow-lg p-6">
                                 <h2 class="text-2xl font-semibold mb-2 text-title">共有財産</h2>
-                                <div class="text-4xl font-bold text-gold" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">
+                                <div class="text-4xl font-bold text-gold" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.2);">
                                     ${state.editingSharedMoney ? `<input type="number" value="${state.sharedAssets.money || 0}" class="w-full bg-transparent text-right border-b-2 border-gold focus:outline-none" onblur="handleUpdateSharedMoney(this.value)" onkeydown="if(event.key === 'Enter') this.blur(); if(event.key === 'Escape') { state.editingSharedMoney = false; render(); }" autofocus onfocus="this.select()">` : `<span onclick="state.editingSharedMoney = true; render();" class="cursor-pointer hover-bg px-2 py-1 rounded">${state.sharedAssets.money || 0} G</span>`}
                                 </div>
                             </div>
@@ -178,24 +166,24 @@
                         <div class="lg:col-span-2 card-bg rounded-lg shadow-lg p-6">
                             ${selectedCharacter ? `
                                 <div class="flex flex-wrap justify-between items-center mb-4 gap-4">
-                                    <div> <h2 class="text-3xl font-semibold text-title">${selectedCharacter.name}の所持品</h2> <p class="text-lg ${isOverWeight ? 'text-red-400 font-semibold' : 'text-muted'}"> 現在重量: ${Math.floor(currentWeight)} / ${Math.floor(selectedCharacter.maxWeight)} ${isOverWeight ? '(超過!)' : ''} </p> </div>
+                                    <div> <h2 class="text-3xl font-semibold text-title">${selectedCharacter.name}の所持品</h2> <p class="text-lg ${isOverWeight ? 'text-red-600 font-semibold' : 'text-muted'}"> 現在重量: ${Math.floor(currentWeight)} / ${Math.floor(selectedCharacter.maxWeight)} ${isOverWeight ? '(超過!)' : ''} </p> </div>
                                     <button onclick="state.showItemModal = true; render();" class="btn btn-secondary text-white px-4 py-2 rounded-md flex items-center gap-2 text-base"> ${icons.plus} アイテム追加 </button>
                                 </div>
-                                <div class="mb-4 p-3 bg-black/20 rounded-lg border border-color">
+                                <div class="mb-4 p-3 bg-black/5 rounded-lg border border-color">
                                      <h3 class="font-semibold mb-2 text-title text-lg">特殊アイテム</h3>
                                      <div class="flex flex-wrap gap-2">
-                                        <button onclick="handleToggleHolder('hasWeaponCase')" class="px-3 py-1 text-sm rounded-full transition-colors text-white ${selectedCharacter.hasWeaponCase ? 'bg-indigo-500 hover:bg-indigo-600' : 'bg-gray-600 hover:bg-gray-500'}"> ウェポンケース ${selectedCharacter.hasWeaponCase ? 'ON' : 'OFF'} </button>
-                                        <button onclick="handleToggleHolder('hasPotionHolder')" class="px-3 py-1 text-sm rounded-full transition-colors text-white ${selectedCharacter.hasPotionHolder ? 'bg-sky-500 hover:bg-sky-600' : 'bg-gray-600 hover:bg-gray-500'}"> ポーションホルダー ${selectedCharacter.hasPotionHolder ? 'ON' : 'OFF'} </button>
-                                        <button onclick="handleToggleHolder('hasLunchBox')" class="px-3 py-1 text-sm rounded-full transition-colors text-white ${selectedCharacter.hasLunchBox ? 'bg-amber-500 hover:bg-amber-600' : 'bg-gray-600 hover:bg-gray-500'}"> ランチボックス ${selectedCharacter.hasLunchBox ? 'ON' : 'OFF'} </button>
-                                        <button onclick="handleToggleHolder('hasToolPouch')" class="px-3 py-1 text-sm rounded-full transition-colors text-white ${selectedCharacter.hasToolPouch ? 'bg-teal-500 hover:bg-teal-600' : 'bg-gray-600 hover:bg-gray-500'}"> 小道具入れ ${selectedCharacter.hasToolPouch ? 'ON' : 'OFF'} </button>
-                                        <button onclick="handleToggleHolder('hasQuiver')" class="px-3 py-1 text-sm rounded-full transition-colors text-white ${selectedCharacter.hasQuiver ? 'bg-orange-500 hover:bg-orange-600' : 'bg-gray-600 hover:bg-gray-500'}"> 矢筒 ${selectedCharacter.hasQuiver ? 'ON' : 'OFF'} </button>
+                                        <button onclick="handleToggleHolder('hasWeaponCase')" class="px-3 py-1 text-sm rounded-full transition-colors text-white ${selectedCharacter.hasWeaponCase ? 'bg-indigo-500 hover:bg-indigo-600' : 'bg-gray-500 hover:bg-gray-600'}"> ウェポンケース ${selectedCharacter.hasWeaponCase ? 'ON' : 'OFF'} </button>
+                                        <button onclick="handleToggleHolder('hasPotionHolder')" class="px-3 py-1 text-sm rounded-full transition-colors text-white ${selectedCharacter.hasPotionHolder ? 'bg-sky-500 hover:bg-sky-600' : 'bg-gray-500 hover:bg-gray-600'}"> ポーションホルダー ${selectedCharacter.hasPotionHolder ? 'ON' : 'OFF'} </button>
+                                        <button onclick="handleToggleHolder('hasLunchBox')" class="px-3 py-1 text-sm rounded-full transition-colors text-white ${selectedCharacter.hasLunchBox ? 'bg-amber-500 hover:bg-amber-600' : 'bg-gray-500 hover:bg-gray-600'}"> ランチボックス ${selectedCharacter.hasLunchBox ? 'ON' : 'OFF'} </button>
+                                        <button onclick="handleToggleHolder('hasToolPouch')" class="px-3 py-1 text-sm rounded-full transition-colors text-white ${selectedCharacter.hasToolPouch ? 'bg-teal-500 hover:bg-teal-600' : 'bg-gray-500 hover:bg-gray-600'}"> 小道具入れ ${selectedCharacter.hasToolPouch ? 'ON' : 'OFF'} </button>
+                                        <button onclick="handleToggleHolder('hasQuiver')" class="px-3 py-1 text-sm rounded-full transition-colors text-white ${selectedCharacter.hasQuiver ? 'bg-orange-500 hover:bg-orange-600' : 'bg-gray-500 hover:bg-gray-600'}"> 矢筒 ${selectedCharacter.hasQuiver ? 'ON' : 'OFF'} </button>
                                      </div>
                                 </div>
 
                                 <!-- PC用テーブル表示 -->
                                 <div class="hidden md:block overflow-x-auto">
                                     <table class="w-full border-collapse border-color text-lg">
-                                        <thead class="bg-black/20">
+                                        <thead class="bg-black/5">
                                             <tr>
                                                 <th class="border-b border-color p-3 text-left"><button onclick="handleSortItems('name')" class="font-bold w-full text-left text-title">アイテム名 ${state.sort.key === 'name' ? (state.sort.order === 'asc' ? '▲' : '▼') : ''}</button></th>
                                                 <th class="border-b border-color p-3 text-left"><button onclick="handleSortItems('type')" class="font-bold w-full text-left text-title">種類 ${state.sort.key === 'type' ? (state.sort.order === 'asc' ? '▲' : '▼') : ''}</button></th>
@@ -206,14 +194,14 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            ${sortedItems.map(item => `<tr class="hover-bg"><td class="border-b border-color p-3">${item.name}</td><td class="border-b border-color p-3"> ${state.editingItemField.id === item.id && state.editingItemField.field === 'type' ? `<select class="w-full input-bg border rounded px-1" onchange="handleUpdateItemField(${item.id}, 'type', this.value)" onblur="state.editingItemField = {id: null, field: null}; render();" autofocus> <option>武器</option><option>ポーション</option><option>食料</option><option>道具</option><option>矢弾</option><option>その他</option> </select>` : `<span onclick="state.editingItemField = {id: ${item.id}, field: 'type'}; render();" class="cursor-pointer hover-bg px-1 rounded">${item.type}</span>`} </td><td class="border-b border-color p-3 text-right"> ${state.editingItemField.id === item.id && state.editingItemField.field === 'weight' ? `<input type="number" value="${item.weight}" class="w-16 input-bg text-right border rounded px-1" onblur="handleUpdateItemField(${item.id}, 'weight', this.value)" onkeydown="if(event.key === 'Enter') this.blur()" autofocus onfocus="this.select()">` : `<span onclick="state.editingItemField = {id: ${item.id}, field: 'weight'}; render();" class="cursor-pointer hover-bg px-1 rounded">${item.weight}</span>`} </td><td class="border-b border-color p-3 text-right"> ${state.editingItemField.id === item.id && state.editingItemField.field === 'quantity' ? `<input type="number" value="${item.quantity}" class="w-16 input-bg text-right border rounded px-1" onblur="handleUpdateItemField(${item.id}, 'quantity', this.value)" onkeydown="if(event.key === 'Enter') this.blur()" autofocus onfocus="this.select()">` : `<span onclick="state.editingItemField = {id: ${item.id}, field: 'quantity'}; render();" class="cursor-pointer hover-bg px-1 rounded">${item.quantity}</span>`} </td><td class="border-b border-color p-3 text-right"> ${state.editingItemField.id === item.id && state.editingItemField.field === 'sellPrice' ? `<input type="number" value="${item.sellPrice}" class="w-20 input-bg text-right border rounded px-1" onblur="handleUpdateItemField(${item.id}, 'sellPrice', this.value)" onkeydown="if(event.key === 'Enter') this.blur()" autofocus onfocus="this.select()">` : `<span onclick="state.editingItemField = {id: ${item.id}, field: 'sellPrice'}; render();" class="cursor-pointer hover-bg px-1 rounded">${item.sellPrice}</span>`} </td><td class="border-b border-color p-3"><div class="flex gap-1 justify-center"><button onclick="handleUseItem(${item.id})" class="btn bg-emerald-700 hover:bg-emerald-600 text-white p-1 rounded" title="使用"> ${icons.use} </button><button onclick="handleSellItem(${item.id})" class="btn bg-amber-600 hover:bg-amber-500 text-white p-1 rounded" title="売却"> ${icons.coin} </button><button onclick='state.moveItemData = { item: ${JSON.stringify(item)}, quantity: 1 }; state.showMoveModal = true; render();' class="btn btn-primary text-white p-1 rounded" title="移動">${icons.arrowRight}</button><button onclick="handleDeleteItem(${item.id})" class="btn bg-red-800 hover:bg-red-700 text-white p-1 rounded" title="削除（破棄）">${icons.trash}</button></div></td></tr>`).join('')}
+                                            ${sortedItems.map(item => `<tr class="hover-bg"><td class="border-b border-color p-3">${item.name}</td><td class="border-b border-color p-3"> ${state.editingItemField.id === item.id && state.editingItemField.field === 'type' ? `<select class="w-full input-bg border rounded px-1" onchange="handleUpdateItemField(${item.id}, 'type', this.value)" onblur="state.editingItemField = {id: null, field: null}; render();" autofocus> <option>武器</option><option>ポーション</option><option>食料</option><option>道具</option><option>矢弾</option><option>その他</option> </select>` : `<span onclick="state.editingItemField = {id: ${item.id}, field: 'type'}; render();" class="cursor-pointer hover-bg px-1 rounded">${item.type}</span>`} </td><td class="border-b border-color p-3 text-right"> ${state.editingItemField.id === item.id && state.editingItemField.field === 'weight' ? `<input type="number" value="${item.weight}" class="w-16 input-bg text-right border rounded px-1" onblur="handleUpdateItemField(${item.id}, 'weight', this.value)" onkeydown="if(event.key === 'Enter') this.blur()" autofocus onfocus="this.select()">` : `<span onclick="state.editingItemField = {id: ${item.id}, field: 'weight'}; render();" class="cursor-pointer hover-bg px-1 rounded">${item.weight}</span>`} </td><td class="border-b border-color p-3 text-right"> ${state.editingItemField.id === item.id && state.editingItemField.field === 'quantity' ? `<input type="number" value="${item.quantity}" class="w-16 input-bg text-right border rounded px-1" onblur="handleUpdateItemField(${item.id}, 'quantity', this.value)" onkeydown="if(event.key === 'Enter') this.blur()" autofocus onfocus="this.select()">` : `<span onclick="state.editingItemField = {id: ${item.id}, field: 'quantity'}; render();" class="cursor-pointer hover-bg px-1 rounded">${item.quantity}</span>`} </td><td class="border-b border-color p-3 text-right"> ${state.editingItemField.id === item.id && state.editingItemField.field === 'sellPrice' ? `<input type="number" value="${item.sellPrice}" class="w-20 input-bg text-right border rounded px-1" onblur="handleUpdateItemField(${item.id}, 'sellPrice', this.value)" onkeydown="if(event.key === 'Enter') this.blur()" autofocus onfocus="this.select()">` : `<span onclick="state.editingItemField = {id: ${item.id}, field: 'sellPrice'}; render();" class="cursor-pointer hover-bg px-1 rounded">${item.sellPrice}</span>`} </td><td class="border-b border-color p-3"><div class="flex gap-1 justify-center"><button onclick="handleUseItem(${item.id})" class="btn text-white p-1 rounded ${state.theme === 'dark' ? 'bg-emerald-700 hover:bg-emerald-600' : 'bg-lime-500 hover:bg-lime-600'}" title="使用"> ${icons.use} </button><button onclick="handleSellItem(${item.id})" class="btn text-white p-1 rounded ${state.theme === 'dark' ? 'bg-amber-600 hover:bg-amber-500' : 'bg-yellow-500 hover:bg-yellow-600'}" title="売却"> ${icons.coin} </button><button onclick='state.moveItemData = { item: ${JSON.stringify(item)}, quantity: 1 }; state.showMoveModal = true; render();' class="btn btn-primary text-white p-1 rounded" title="移動">${icons.arrowRight}</button><button onclick="handleDeleteItem(${item.id})" class="btn text-white p-1 rounded ${state.theme === 'dark' ? 'bg-red-800 hover:bg-red-700' : 'bg-rose-500 hover:bg-rose-600'}" title="削除（破棄）">${icons.trash}</button></div></td></tr>`).join('')}
                                         </tbody>
                                     </table>
                                 </div>
 
                                 <!-- モバイル用カード表示 -->
                                 <div class="md:hidden space-y-3">
-                                    ${sortedItems.map(item => `<div class="bg-black/20 border border-color rounded-lg p-3"><div class="font-bold text-xl text-body mb-2">${item.name}</div><div class="grid grid-cols-2 gap-x-4 gap-y-1 text-base text-muted"><div><span class="font-semibold text-stone-400">種類:</span> ${item.type}</div><div><span class="font-semibold text-stone-400">個数:</span> ${item.quantity}</div><div><span class="font-semibold text-stone-400">重量:</span> ${item.weight}</div><div><span class="font-semibold text-stone-400">売却額:</span> ${item.sellPrice} G</div></div><div class="mt-3 pt-3 border-t border-color flex gap-2 justify-end"><button onclick="handleUseItem(${item.id})" class="flex-1 btn bg-emerald-700 hover:bg-emerald-600 text-white px-3 py-1 text-base rounded-md flex items-center justify-center gap-1"> ${icons.use} 使用</button><button onclick="handleSellItem(${item.id})" class="flex-1 btn bg-amber-600 hover:bg-amber-500 text-white px-3 py-1 text-base rounded-md flex items-center justify-center gap-1"> ${icons.coin} 売却</button><button onclick='state.moveItemData = { item: ${JSON.stringify(item)}, quantity: 1 }; state.showMoveModal = true; render();' class="btn btn-primary text-white p-2 rounded-md" title="移動">${icons.arrowRight}</button><button onclick="handleDeleteItem(${item.id})" class="btn bg-red-800 hover:bg-red-700 text-white p-2 rounded-md" title="削除（破棄）">${icons.trash}</button></div></div>`).join('')}
+                                    ${sortedItems.map(item => `<div class="bg-black/10 border border-color rounded-lg p-3"><div class="font-bold text-xl text-body mb-2">${item.name}</div><div class="grid grid-cols-2 gap-x-4 gap-y-1 text-base text-muted"><div><span class="font-semibold text-gray-500">種類:</span> ${item.type}</div><div><span class="font-semibold text-gray-500">個数:</span> ${item.quantity}</div><div><span class="font-semibold text-gray-500">重量:</span> ${item.weight}</div><div><span class="font-semibold text-gray-500">売却額:</span> ${item.sellPrice} G</div></div><div class="mt-3 pt-3 border-t border-color flex gap-2 justify-end"><button onclick="handleUseItem(${item.id})" class="flex-1 btn text-white px-3 py-1 text-base rounded-md flex items-center justify-center gap-1 ${state.theme === 'dark' ? 'bg-emerald-700 hover:bg-emerald-600' : 'bg-lime-500 hover:bg-lime-600'}"> ${icons.use} 使用</button><button onclick="handleSellItem(${item.id})" class="flex-1 btn text-white px-3 py-1 text-base rounded-md flex items-center justify-center gap-1 ${state.theme === 'dark' ? 'bg-amber-600 hover:bg-amber-500' : 'bg-yellow-500 hover:bg-yellow-600'}"> ${icons.coin} 売却</button><button onclick='state.moveItemData = { item: ${JSON.stringify(item)}, quantity: 1 }; state.showMoveModal = true; render();' class="btn btn-primary text-white p-2 rounded-md" title="移動">${icons.arrowRight}</button><button onclick="handleDeleteItem(${item.id})" class="btn text-white p-2 rounded-md ${state.theme === 'dark' ? 'bg-red-800 hover:bg-red-700' : 'bg-rose-500 hover:bg-rose-600'}" title="削除（破棄）">${icons.trash}</button></div></div>`).join('')}
                                 </div>
                             ` : `<div class="text-center text-muted py-12 text-lg">キャラクターを選択してください</div>`}
                         </div>
@@ -221,9 +209,9 @@
                     <div class="card-bg rounded-lg shadow-lg p-6">
                         <div class="flex justify-between items-center mb-4">
                             <h2 class="text-2xl font-semibold text-title">アクションログ</h2>
-                            ${(state.logs && state.logs.length > 0) ? `<button onclick="handleClearAllLogs()" class="btn bg-red-800 hover:bg-red-700 text-white px-3 py-1 rounded text-base flex items-center gap-1">${icons.trash} 全削除</button>` : ''}
+                            ${(state.logs && state.logs.length > 0) ? `<button onclick="handleClearAllLogs()" class="btn ${state.theme === 'dark' ? 'bg-red-800 hover:bg-red-700' : 'bg-rose-500 hover:bg-rose-600'} text-white px-3 py-1 rounded text-base flex items-center gap-1">${icons.trash} 全削除</button>` : ''}
                         </div>
-                        <div class="max-h-64 overflow-y-auto border border-color rounded p-4 bg-black/20">
+                        <div class="max-h-64 overflow-y-auto border border-color rounded p-4 bg-black/10">
                             ${(!state.logs || state.logs.length === 0) ? `<p class="text-center text-muted">まだログがありません</p>` : `<div class="space-y-1">${state.logs.map(log => `<div class="text-base flex justify-between items-center hover-bg px-2 py-1 rounded group"><div><span class="text-muted">${log.timestamp}</span><span class="mx-2 text-muted/50">|</span><span>${log.message}</span></div><button onclick="handleDeleteLog(${log.id})" class="opacity-0 group-hover:opacity-100 bg-red-500 hover:bg-red-600 text-white p-1 rounded transition-opacity" title="このログを削除"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button></div>`).join('')}</div>`}
                         </div>
                     </div>
