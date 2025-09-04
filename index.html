@@ -12,46 +12,42 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- ★変更点: より装飾的なフォントに変更 -->
     <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Merriweather&display=swap" rel="stylesheet">
 
     <style>
-        /* ★変更点: デザインを全面的に刷新 */
+        /* ★変更点: デザインを調整 */
         body { 
             font-family: 'Merriweather', serif;
-            /* 壮大な背景画像 */
             background-image: url('https://images.unsplash.com/photo-1549317336-206569e8ad8f?q=80&w=2574&auto=format&fit=crop');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
-            color: #EAE0D5; /* 基本の文字色をオフホワイトに */
+            color: #DCDCDC; /* 基本の文字色を明るいグレーに */
         }
         h1, h2, h3, h4, h5, h6 { 
             font-family: 'Cinzel Decorative', serif; 
-            letter-spacing: 0.1em; /* 文字間を少し広げる */
+            letter-spacing: 0.1em;
         }
-        /* カードの背景（半透明） */
         .card-bg {
-            background-color: rgba(12, 18, 24, 0.85);
-            backdrop-filter: blur(4px);
-            border: 1px solid rgba(200, 160, 80, 0.3);
+            background-color: rgba(41, 37, 36, 0.85); /* 半透明のダークブラウン */
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(212, 175, 55, 0.3); /* ゴールドの枠線 */
         }
-        /* ボタンのスタイル */
         .btn {
             transition: all 0.2s ease-in-out;
-            border: 1px solid rgba(200, 160, 80, 0.6);
-            background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.2));
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            border: 1px solid rgba(212, 175, 55, 0.6);
+            background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.08), rgba(0, 0, 0, 0.2));
+            box-shadow: 0 2px 4px rgba(0,0,0,0.4);
         }
         .btn:hover {
             transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
-            border-color: rgba(220, 180, 100, 0.8);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+            border-color: rgba(222, 185, 65, 0.9);
         }
 
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.7); display: flex; align-items: center; justify-content: center; z-index: 50; backdrop-filter: blur(4px); }
         .dragging { opacity: 0.5; }
-        .drag-over { border-top: 2px solid #e1b33c; } /* ゴールドの線 */
+        .drag-over { border-top: 2px solid #FFD700; } /* ゴールドの線 */
     </style>
 </head>
 <body class="bg-gray-900">
@@ -137,20 +133,20 @@
                         <div>
                             <div class="card-bg rounded-lg shadow-lg p-6 mb-6">
                                 <div class="flex justify-between items-center mb-4">
-                                    <h2 class="text-2xl font-semibold text-amber-200">キャラクター一覧</h2>
-                                    <button onclick="state.showCharacterModal = true; render();" class="btn bg-teal-600 hover:bg-teal-500 text-white px-3 py-1 rounded-md flex items-center gap-1"> ${icons.plus} 追加 </button>
+                                    <h2 class="text-2xl font-semibold text-amber-300">キャラクター一覧</h2>
+                                    <button onclick="state.showCharacterModal = true; render();" class="btn bg-emerald-700 hover:bg-emerald-600 text-white px-3 py-1 rounded-md flex items-center gap-1 text-base"> ${icons.plus} 追加 </button>
                                 </div>
                                 <div class="space-y-2">
                                     ${ (state.characters || []).map(character => {
                                         const weight = calculateCurrentWeight(character);
                                         const isOver = weight > character.maxWeight;
                                         const isSelected = character.id === state.selectedCharacterId;
-                                        return `<div draggable="true" ondragstart="handleDragStart(${character.id}, event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(${character.id}, event)" ondragend="handleDragEnd(event)" onclick="state.selectedCharacterId = ${character.id}; render()" class="p-3 rounded-lg transition-all duration-200 flex items-center gap-3 ${isSelected ? 'bg-amber-900/50 border-amber-400' : 'bg-black/30 hover:bg-black/50'} ${isOver ? 'bg-red-900/50 border-red-500' : 'border-transparent'} border"> <div>${icons.grip}</div> <div class="flex-grow"> <div class="flex justify-between items-center"> <div class="font-bold text-lg text-amber-100">${character.name}</div> <div class="flex items-center gap-1"> <button onclick="openEditCharacterModal(${character.id}, event)" class="text-sky-300 hover:text-sky-100 p-1 rounded-full hover:bg-white/10 transition-colors" title="携帯可能重量を編集"> ${icons.edit} </button> <button onclick="handleDeleteCharacter(${character.id}, event)" class="text-red-400 hover:text-red-300 p-1 rounded-full hover:bg-white/10 transition-colors" title="${character.name}を削除"> ${icons.trash} </button> </div> </div> <div class="text-base ${isOver ? 'text-red-400 font-semibold' : 'text-amber-200/80'}"> ${Math.floor(weight)} / ${Math.floor(character.maxWeight)} ${isOver ? '(超過!)' : ''} </div> </div> </div>`;
+                                        return `<div draggable="true" ondragstart="handleDragStart(${character.id}, event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(${character.id}, event)" ondragend="handleDragEnd(event)" onclick="state.selectedCharacterId = ${character.id}; render()" class="p-3 rounded-lg transition-all duration-200 flex items-center gap-3 ${isSelected ? 'bg-amber-900/60 border-amber-400' : 'bg-black/30 hover:bg-black/50'} ${isOver ? 'bg-red-900/60 border-red-500' : 'border-transparent'} border"> <div>${icons.grip}</div> <div class="flex-grow"> <div class="flex justify-between items-center"> <div class="font-bold text-xl text-stone-100">${character.name}</div> <div class="flex items-center gap-1"> <button onclick="openEditCharacterModal(${character.id}, event)" class="text-sky-300 hover:text-sky-100 p-1 rounded-full hover:bg-white/10 transition-colors" title="携帯可能重量を編集"> ${icons.edit} </button> <button onclick="handleDeleteCharacter(${character.id}, event)" class="text-red-400 hover:text-red-300 p-1 rounded-full hover:bg-white/10 transition-colors" title="${character.name}を削除"> ${icons.trash} </button> </div> </div> <div class="text-lg ${isOver ? 'text-red-400 font-semibold' : 'text-stone-300'}"> ${Math.floor(weight)} / ${Math.floor(character.maxWeight)} ${isOver ? '(超過!)' : ''} </div> </div> </div>`;
                                     }).join('')}
                                 </div>
                             </div>
                             <div class="card-bg rounded-lg shadow-lg p-6">
-                                <h2 class="text-2xl font-semibold mb-2 text-amber-200">共有財産</h2>
+                                <h2 class="text-2xl font-semibold mb-2 text-amber-300">共有財産</h2>
                                 <div class="text-4xl font-bold text-amber-400" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">
                                     ${state.editingSharedMoney ? `<input type="number" value="${state.sharedAssets.money || 0}" class="w-full bg-transparent text-right border-b-2 border-amber-400 focus:outline-none" onblur="handleUpdateSharedMoney(this.value)" onkeydown="if(event.key === 'Enter') this.blur(); if(event.key === 'Escape') { state.editingSharedMoney = false; render(); }" autofocus onfocus="this.select()">` : `<span onclick="state.editingSharedMoney = true; render();" class="cursor-pointer hover:bg-white/10 px-2 py-1 rounded">${state.sharedAssets.money || 0} G</span>`}
                                 </div>
@@ -159,11 +155,11 @@
                         <div class="lg:col-span-2 card-bg rounded-lg shadow-lg p-6">
                             ${selectedCharacter ? `
                                 <div class="flex flex-wrap justify-between items-center mb-4 gap-4">
-                                    <div> <h2 class="text-3xl font-semibold text-amber-200">${selectedCharacter.name}の所持品</h2> <p class="text-base ${isOverWeight ? 'text-red-400 font-semibold' : 'text-amber-200/80'}"> 現在重量: ${Math.floor(currentWeight)} / ${Math.floor(selectedCharacter.maxWeight)} ${isOverWeight ? '(超過!)' : ''} </p> </div>
-                                    <button onclick="state.showItemModal = true; render();" class="btn bg-emerald-700 hover:bg-emerald-600 text-white px-4 py-2 rounded-md flex items-center gap-2"> ${icons.plus} アイテム追加 </button>
+                                    <div> <h2 class="text-3xl font-semibold text-amber-300">${selectedCharacter.name}の所持品</h2> <p class="text-lg ${isOverWeight ? 'text-red-400 font-semibold' : 'text-stone-300'}"> 現在重量: ${Math.floor(currentWeight)} / ${Math.floor(selectedCharacter.maxWeight)} ${isOverWeight ? '(超過!)' : ''} </p> </div>
+                                    <button onclick="state.showItemModal = true; render();" class="btn bg-emerald-700 hover:bg-emerald-600 text-white px-4 py-2 rounded-md flex items-center gap-2 text-base"> ${icons.plus} アイテム追加 </button>
                                 </div>
                                 <div class="mb-4 p-3 bg-black/30 rounded-lg border border-amber-500/20">
-                                     <h3 class="font-semibold mb-2 text-amber-200">特殊アイテム</h3>
+                                     <h3 class="font-semibold mb-2 text-amber-300 text-lg">特殊アイテム</h3>
                                      <div class="flex flex-wrap gap-2">
                                         <button onclick="handleToggleHolder('hasWeaponCase')" class="px-3 py-1 text-sm rounded-full transition-colors text-white ${selectedCharacter.hasWeaponCase ? 'bg-indigo-500 hover:bg-indigo-600' : 'bg-gray-600 hover:bg-gray-500'}"> ウェポンケース ${selectedCharacter.hasWeaponCase ? 'ON' : 'OFF'} </button>
                                         <button onclick="handleToggleHolder('hasPotionHolder')" class="px-3 py-1 text-sm rounded-full transition-colors text-white ${selectedCharacter.hasPotionHolder ? 'bg-sky-500 hover:bg-sky-600' : 'bg-gray-600 hover:bg-gray-500'}"> ポーションホルダー ${selectedCharacter.hasPotionHolder ? 'ON' : 'OFF'} </button>
@@ -175,26 +171,26 @@
 
                                 <!-- PC用テーブル表示 -->
                                 <div class="hidden md:block overflow-x-auto">
-                                    <table class="w-full border-collapse border-amber-500/20">
+                                    <table class="w-full border-collapse border-amber-500/20 text-lg">
                                         <thead>
                                             <tr class="bg-black/30">
-                                                <th class="border-b border-amber-500/20 p-2 text-left"><button onclick="handleSortItems('name')" class="font-bold w-full text-left text-amber-200">アイテム名 ${state.sort.key === 'name' ? (state.sort.order === 'asc' ? '▲' : '▼') : ''}</button></th>
-                                                <th class="border-b border-amber-500/20 p-2 text-left"><button onclick="handleSortItems('type')" class="font-bold w-full text-left text-amber-200">種類 ${state.sort.key === 'type' ? (state.sort.order === 'asc' ? '▲' : '▼') : ''}</button></th>
-                                                <th class="border-b border-amber-500/20 p-2 text-right"><button onclick="handleSortItems('weight')" class="font-bold w-full text-right text-amber-200">重量 ${state.sort.key === 'weight' ? (state.sort.order === 'asc' ? '▲' : '▼') : ''}</button></th>
-                                                <th class="border-b border-amber-500/20 p-2 text-right"><button onclick="handleSortItems('quantity')" class="font-bold w-full text-right text-amber-200">個数 ${state.sort.key === 'quantity' ? (state.sort.order === 'asc' ? '▲' : '▼') : ''}</button></th>
-                                                <th class="border-b border-amber-500/20 p-2 text-right"><button onclick="handleSortItems('sellPrice')" class="font-bold w-full text-right text-amber-200">売却額 ${state.sort.key === 'sellPrice' ? (state.sort.order === 'asc' ? '▲' : '▼') : ''}</button></th>
-                                                <th class="border-b border-amber-500/20 p-2 text-center text-amber-200">操作</th>
+                                                <th class="border-b border-amber-500/20 p-3 text-left"><button onclick="handleSortItems('name')" class="font-bold w-full text-left text-amber-300">アイテム名 ${state.sort.key === 'name' ? (state.sort.order === 'asc' ? '▲' : '▼') : ''}</button></th>
+                                                <th class="border-b border-amber-500/20 p-3 text-left"><button onclick="handleSortItems('type')" class="font-bold w-full text-left text-amber-300">種類 ${state.sort.key === 'type' ? (state.sort.order === 'asc' ? '▲' : '▼') : ''}</button></th>
+                                                <th class="border-b border-amber-500/20 p-3 text-right"><button onclick="handleSortItems('weight')" class="font-bold w-full text-right text-amber-300">重量 ${state.sort.key === 'weight' ? (state.sort.order === 'asc' ? '▲' : '▼') : ''}</button></th>
+                                                <th class="border-b border-amber-500/20 p-3 text-right"><button onclick="handleSortItems('quantity')" class="font-bold w-full text-right text-amber-300">個数 ${state.sort.key === 'quantity' ? (state.sort.order === 'asc' ? '▲' : '▼') : ''}</button></th>
+                                                <th class="border-b border-amber-500/20 p-3 text-right"><button onclick="handleSortItems('sellPrice')" class="font-bold w-full text-right text-amber-300">売却額 ${state.sort.key === 'sellPrice' ? (state.sort.order === 'asc' ? '▲' : '▼') : ''}</button></th>
+                                                <th class="border-b border-amber-500/20 p-3 text-center text-amber-300">操作</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             ${sortedItems.map(item => `
                                                 <tr class="hover:bg-black/20">
-                                                    <td class="border-b border-amber-500/20 p-2">${item.name}</td>
-                                                    <td class="border-b border-amber-500/20 p-2"> ${state.editingItemField.id === item.id && state.editingItemField.field === 'type' ? `<select class="w-full bg-stone-800 border rounded px-1" onchange="handleUpdateItemField(${item.id}, 'type', this.value)" onblur="state.editingItemField = {id: null, field: null}; render();" autofocus> <option value="武器" ${item.type === '武器' ? 'selected' : ''}>武器</option> <option value="ポーション" ${item.type === 'ポーション' ? 'selected' : ''}>ポーション</option> <option value="食料" ${item.type === '食料' ? 'selected' : ''}>食料</option> <option value="道具" ${item.type === '道具' ? 'selected' : ''}>道具</option> <option value="矢弾" ${item.type === '矢弾' ? 'selected' : ''}>矢弾</option> <option value="その他" ${item.type === 'その他' ? 'selected' : ''}>その他</option> </select>` : `<span onclick="state.editingItemField = {id: ${item.id}, field: 'type'}; render();" class="cursor-pointer hover:bg-white/10 px-1 rounded">${item.type}</span>`} </td>
-                                                    <td class="border-b border-amber-500/20 p-2 text-right"> ${state.editingItemField.id === item.id && state.editingItemField.field === 'weight' ? `<input type="number" value="${item.weight}" class="w-16 bg-stone-800 text-right border rounded px-1" onblur="handleUpdateItemField(${item.id}, 'weight', this.value)" onkeydown="if(event.key === 'Enter') this.blur()" autofocus onfocus="this.select()">` : `<span onclick="state.editingItemField = {id: ${item.id}, field: 'weight'}; render();" class="cursor-pointer hover:bg-white/10 px-1 rounded">${item.weight}</span>`} </td>
-                                                    <td class="border-b border-amber-500/20 p-2 text-right"> ${state.editingItemField.id === item.id && state.editingItemField.field === 'quantity' ? `<input type="number" value="${item.quantity}" class="w-16 bg-stone-800 text-right border rounded px-1" onblur="handleUpdateItemField(${item.id}, 'quantity', this.value)" onkeydown="if(event.key === 'Enter') this.blur()" autofocus onfocus="this.select()">` : `<span onclick="state.editingItemField = {id: ${item.id}, field: 'quantity'}; render();" class="cursor-pointer hover:bg-white/10 px-1 rounded">${item.quantity}</span>`} </td>
-                                                    <td class="border-b border-amber-500/20 p-2 text-right"> ${state.editingItemField.id === item.id && state.editingItemField.field === 'sellPrice' ? `<input type="number" value="${item.sellPrice}" class="w-20 bg-stone-800 text-right border rounded px-1" onblur="handleUpdateItemField(${item.id}, 'sellPrice', this.value)" onkeydown="if(event.key === 'Enter') this.blur()" autofocus onfocus="this.select()">` : `<span onclick="state.editingItemField = {id: ${item.id}, field: 'sellPrice'}; render();" class="cursor-pointer hover:bg-white/10 px-1 rounded">${item.sellPrice}</span>`} </td>
-                                                    <td class="border-b border-amber-500/20 p-2">
+                                                    <td class="border-b border-amber-500/20 p-3">${item.name}</td>
+                                                    <td class="border-b border-amber-500/20 p-3"> ${state.editingItemField.id === item.id && state.editingItemField.field === 'type' ? `<select class="w-full bg-stone-800 border rounded px-1" onchange="handleUpdateItemField(${item.id}, 'type', this.value)" onblur="state.editingItemField = {id: null, field: null}; render();" autofocus> <option value="武器" ${item.type === '武器' ? 'selected' : ''}>武器</option> <option value="ポーション" ${item.type === 'ポーション' ? 'selected' : ''}>ポーション</option> <option value="食料" ${item.type === '食料' ? 'selected' : ''}>食料</option> <option value="道具" ${item.type === '道具' ? 'selected' : ''}>道具</option> <option value="矢弾" ${item.type === '矢弾' ? 'selected' : ''}>矢弾</option> <option value="その他" ${item.type === 'その他' ? 'selected' : ''}>その他</option> </select>` : `<span onclick="state.editingItemField = {id: ${item.id}, field: 'type'}; render();" class="cursor-pointer hover:bg-white/10 px-1 rounded">${item.type}</span>`} </td>
+                                                    <td class="border-b border-amber-500/20 p-3 text-right"> ${state.editingItemField.id === item.id && state.editingItemField.field === 'weight' ? `<input type="number" value="${item.weight}" class="w-16 bg-stone-800 text-right border rounded px-1" onblur="handleUpdateItemField(${item.id}, 'weight', this.value)" onkeydown="if(event.key === 'Enter') this.blur()" autofocus onfocus="this.select()">` : `<span onclick="state.editingItemField = {id: ${item.id}, field: 'weight'}; render();" class="cursor-pointer hover:bg-white/10 px-1 rounded">${item.weight}</span>`} </td>
+                                                    <td class="border-b border-amber-500/20 p-3 text-right"> ${state.editingItemField.id === item.id && state.editingItemField.field === 'quantity' ? `<input type="number" value="${item.quantity}" class="w-16 bg-stone-800 text-right border rounded px-1" onblur="handleUpdateItemField(${item.id}, 'quantity', this.value)" onkeydown="if(event.key === 'Enter') this.blur()" autofocus onfocus="this.select()">` : `<span onclick="state.editingItemField = {id: ${item.id}, field: 'quantity'}; render();" class="cursor-pointer hover:bg-white/10 px-1 rounded">${item.quantity}</span>`} </td>
+                                                    <td class="border-b border-amber-500/20 p-3 text-right"> ${state.editingItemField.id === item.id && state.editingItemField.field === 'sellPrice' ? `<input type="number" value="${item.sellPrice}" class="w-20 bg-stone-800 text-right border rounded px-1" onblur="handleUpdateItemField(${item.id}, 'sellPrice', this.value)" onkeydown="if(event.key === 'Enter') this.blur()" autofocus onfocus="this.select()">` : `<span onclick="state.editingItemField = {id: ${item.id}, field: 'sellPrice'}; render();" class="cursor-pointer hover:bg-white/10 px-1 rounded">${item.sellPrice}</span>`} </td>
+                                                    <td class="border-b border-amber-500/20 p-3">
                                                         <div class="flex gap-1 justify-center">
                                                             <button onclick="handleUseItem(${item.id})" class="btn bg-emerald-700 hover:bg-emerald-600 text-white p-1 rounded" title="使用"> ${icons.use} </button>
                                                             <button onclick="handleSellItem(${item.id})" class="btn bg-amber-600 hover:bg-amber-500 text-white p-1 rounded" title="売却"> ${icons.coin} </button>
@@ -212,32 +208,32 @@
                                 <div class="md:hidden space-y-3">
                                     ${sortedItems.map(item => `
                                         <div class="bg-black/30 border border-amber-500/20 rounded-lg p-3">
-                                            <div class="font-bold text-lg text-amber-100 mb-2">${item.name}</div>
-                                            <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-sm text-amber-200/80">
-                                                <div><span class="font-semibold text-amber-200/60">種類:</span> ${item.type}</div>
-                                                <div><span class="font-semibold text-amber-200/60">個数:</span> ${item.quantity}</div>
-                                                <div><span class="font-semibold text-amber-200/60">重量:</span> ${item.weight}</div>
-                                                <div><span class="font-semibold text-amber-200/60">売却額:</span> ${item.sellPrice} G</div>
+                                            <div class="font-bold text-xl text-stone-100 mb-2">${item.name}</div>
+                                            <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-base text-stone-300">
+                                                <div><span class="font-semibold text-stone-400">種類:</span> ${item.type}</div>
+                                                <div><span class="font-semibold text-stone-400">個数:</span> ${item.quantity}</div>
+                                                <div><span class="font-semibold text-stone-400">重量:</span> ${item.weight}</div>
+                                                <div><span class="font-semibold text-stone-400">売却額:</span> ${item.sellPrice} G</div>
                                             </div>
                                             <div class="mt-3 pt-3 border-t border-amber-500/20 flex gap-2 justify-end">
-                                                <button onclick="handleUseItem(${item.id})" class="flex-1 btn bg-emerald-700 hover:bg-emerald-600 text-white px-3 py-1 text-sm rounded-md flex items-center justify-center gap-1"> ${icons.use} 使用</button>
-                                                <button onclick="handleSellItem(${item.id})" class="flex-1 btn bg-amber-600 hover:bg-amber-500 text-white px-3 py-1 text-sm rounded-md flex items-center justify-center gap-1"> ${icons.coin} 売却</button>
+                                                <button onclick="handleUseItem(${item.id})" class="flex-1 btn bg-emerald-700 hover:bg-emerald-600 text-white px-3 py-1 text-base rounded-md flex items-center justify-center gap-1"> ${icons.use} 使用</button>
+                                                <button onclick="handleSellItem(${item.id})" class="flex-1 btn bg-amber-600 hover:bg-amber-500 text-white px-3 py-1 text-base rounded-md flex items-center justify-center gap-1"> ${icons.coin} 売却</button>
                                                 <button onclick='state.moveItemData = { item: ${JSON.stringify(item)}, quantity: 1 }; state.showMoveModal = true; render();' class="btn bg-sky-700 hover:bg-sky-600 text-white p-2 rounded-md" title="移動">${icons.arrowRight}</button>
                                                 <button onclick="handleDeleteItem(${item.id})" class="btn bg-red-800 hover:bg-red-700 text-white p-2 rounded-md" title="削除（破棄）">${icons.trash}</button>
                                             </div>
                                         </div>
                                     `).join('')}
                                 </div>
-                            ` : `<div class="text-center text-amber-200/70 py-12">キャラクターを選択してください</div>`}
+                            ` : `<div class="text-center text-amber-200/70 py-12 text-lg">キャラクターを選択してください</div>`}
                         </div>
                     </div>
                     <div class="card-bg rounded-lg shadow-lg p-6">
                         <div class="flex justify-between items-center mb-4">
-                            <h2 class="text-2xl font-semibold text-amber-200">アクションログ</h2>
-                            ${(state.logs && state.logs.length > 0) ? `<button onclick="handleClearAllLogs()" class="btn bg-red-800 hover:bg-red-700 text-white px-3 py-1 rounded text-sm flex items-center gap-1">${icons.trash} 全削除</button>` : ''}
+                            <h2 class="text-2xl font-semibold text-amber-300">アクションログ</h2>
+                            ${(state.logs && state.logs.length > 0) ? `<button onclick="handleClearAllLogs()" class="btn bg-red-800 hover:bg-red-700 text-white px-3 py-1 rounded text-base flex items-center gap-1">${icons.trash} 全削除</button>` : ''}
                         </div>
                         <div class="max-h-64 overflow-y-auto border border-amber-500/20 rounded p-4 bg-black/30">
-                            ${(!state.logs || state.logs.length === 0) ? `<p class="text-amber-200/70 text-center">まだログがありません</p>` : `<div class="space-y-1">${state.logs.map(log => `<div class="text-sm flex justify-between items-center hover:bg-black/20 px-2 py-1 rounded group"><div><span class="text-amber-200/60">${log.timestamp}</span><span class="mx-2 text-amber-200/40">|</span><span>${log.message}</span></div><button onclick="handleDeleteLog(${log.id})" class="opacity-0 group-hover:opacity-100 bg-red-500 hover:bg-red-600 text-white p-1 rounded transition-opacity" title="このログを削除"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button></div>`).join('')}</div>`}
+                            ${(!state.logs || state.logs.length === 0) ? `<p class="text-amber-200/70 text-center">まだログがありません</p>` : `<div class="space-y-1">${state.logs.map(log => `<div class="text-base flex justify-between items-center hover:bg-black/20 px-2 py-1 rounded group"><div><span class="text-amber-200/60">${log.timestamp}</span><span class="mx-2 text-amber-200/40">|</span><span>${log.message}</span></div><button onclick="handleDeleteLog(${log.id})" class="opacity-0 group-hover:opacity-100 bg-red-500 hover:bg-red-600 text-white p-1 rounded transition-opacity" title="このログを削除"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button></div>`).join('')}</div>`}
                         </div>
                     </div>
                 </div>
@@ -247,33 +243,33 @@
         
         function renderModals() {
             let modalHTML = '';
-            if (state.showCharacterModal) { modalHTML += `<div class="modal-overlay"> <div class="card-bg p-6 rounded-lg w-96"> <h3 class="text-lg font-semibold mb-4 text-amber-200">キャラクター追加</h3> <div class="space-y-4"> <div> <label class="block text-sm font-medium mb-1 text-amber-200/80">キャラクター名</label> <input type="text" value="${state.characterForm.name}" oninput="state.characterForm.name = this.value" class="w-full bg-stone-900/50 border border-amber-500/30 rounded px-3 py-2 focus:outline-none focus:border-amber-400"> </div> <div> <label class="block text-sm font-medium mb-1 text-amber-200/80">携帯可能重量</label> <input type="number" min="0" value="${state.characterForm.maxWeight}" oninput="state.characterForm.maxWeight = Number(this.value)" class="w-full bg-stone-900/50 border border-amber-500/30 rounded px-3 py-2 focus:outline-none focus:border-amber-400"> </div> </div> <div class="flex justify-end space-x-2 mt-6"> <button onclick="state.showCharacterModal = false; render();" class="btn px-4 py-2 bg-stone-700 hover:bg-stone-600 rounded">キャンセル</button> <button onclick="handleAddCharacter()" class="btn px-4 py-2 bg-sky-700 text-white rounded hover:bg-sky-600">追加</button> </div> </div> </div>`; }
-            if (state.showItemModal) { modalHTML += `<div class="modal-overlay"> <div class="card-bg p-6 rounded-lg w-96"> <h3 class="text-lg font-semibold mb-4 text-amber-200">アイテム追加</h3> <div class="space-y-4"> <div> <label class="block text-sm font-medium mb-1 text-amber-200/80">アイテム名</label> <input type="text" value="${state.itemForm.name}" oninput="state.itemForm.name = this.value" class="w-full bg-stone-900/50 border border-amber-500/30 rounded px-3 py-2 focus:outline-none focus:border-amber-400"> </div> <div class="grid grid-cols-2 gap-4"> <div> <label class="block text-sm font-medium mb-1 text-amber-200/80">重量</label> <input type="number" min="0" step="1" value="${state.itemForm.weight}" oninput="this.value = Math.floor(this.value || 0); state.itemForm.weight = Number(this.value);" class="w-full bg-stone-900/50 border border-amber-500/30 rounded px-3 py-2 focus:outline-none focus:border-amber-400"/> </div> <div> <label class="block text-sm font-medium mb-1 text-amber-200/80">個数</label> <input type="number" min="1" value="${state.itemForm.quantity}" oninput="state.itemForm.quantity = Number(this.value)" class="w-full bg-stone-900/50 border border-amber-500/30 rounded px-3 py-2 focus:outline-none focus:border-amber-400"/> </div> </div> <div> <label class="block text-sm font-medium mb-1 text-amber-200/80">売却金額</label> <input type="number" min="0" value="${state.itemForm.sellPrice}" oninput="state.itemForm.sellPrice = Number(this.value)" class="w-full bg-stone-900/50 border border-amber-500/30 rounded px-3 py-2 focus:outline-none focus:border-amber-400"/> </div> <div> <label class="block text-sm font-medium mb-1 text-amber-200/80">種類</label> <select onchange="state.itemForm.type = this.value" class="w-full bg-stone-900/50 border border-amber-500/30 rounded px-3 py-2 focus:outline-none focus:border-amber-400"> <option value="武器">武器</option> <option value="ポーション">ポーション</option> <option value="食料">食料</option> <option value="道具">道具</option> <option value="矢弾">矢弾</option> <option value="その他">その他</option> </select> </div> </div> <div class="flex justify-end space-x-2 mt-6"> <button onclick="state.showItemModal = false; render();" class="btn px-4 py-2 bg-stone-700 hover:bg-stone-600 rounded">キャンセル</button> <button onclick="handleAddItem()" class="btn px-4 py-2 bg-emerald-700 text-white rounded hover:bg-emerald-600">追加</button> </div> </div> </div>`; }
+            if (state.showCharacterModal) { modalHTML += `<div class="modal-overlay"> <div class="card-bg p-6 rounded-lg w-96"> <h3 class="text-xl font-semibold mb-4 text-amber-300">キャラクター追加</h3> <div class="space-y-4"> <div> <label class="block text-base font-medium mb-1 text-stone-300">キャラクター名</label> <input type="text" value="${state.characterForm.name}" oninput="state.characterForm.name = this.value" class="w-full bg-stone-900/50 border border-amber-500/30 rounded px-3 py-2 focus:outline-none focus:border-amber-400 text-stone-100"> </div> <div> <label class="block text-base font-medium mb-1 text-stone-300">携帯可能重量</label> <input type="number" min="0" value="${state.characterForm.maxWeight}" oninput="state.characterForm.maxWeight = Number(this.value)" class="w-full bg-stone-900/50 border border-amber-500/30 rounded px-3 py-2 focus:outline-none focus:border-amber-400 text-stone-100"> </div> </div> <div class="flex justify-end space-x-2 mt-6"> <button onclick="state.showCharacterModal = false; render();" class="btn px-4 py-2 bg-stone-700 hover:bg-stone-600 rounded text-base">キャンセル</button> <button onclick="handleAddCharacter()" class="btn px-4 py-2 bg-emerald-700 text-white rounded hover:bg-emerald-600 text-base">追加</button> </div> </div> </div>`; }
+            if (state.showItemModal) { modalHTML += `<div class="modal-overlay"> <div class="card-bg p-6 rounded-lg w-96"> <h3 class="text-xl font-semibold mb-4 text-amber-300">アイテム追加</h3> <div class="space-y-4"> <div> <label class="block text-base font-medium mb-1 text-stone-300">アイテム名</label> <input type="text" value="${state.itemForm.name}" oninput="state.itemForm.name = this.value" class="w-full bg-stone-900/50 border border-amber-500/30 rounded px-3 py-2 focus:outline-none focus:border-amber-400 text-stone-100"> </div> <div class="grid grid-cols-2 gap-4"> <div> <label class="block text-base font-medium mb-1 text-stone-300">重量</label> <input type="number" min="0" step="1" value="${state.itemForm.weight}" oninput="this.value = Math.floor(this.value || 0); state.itemForm.weight = Number(this.value);" class="w-full bg-stone-900/50 border border-amber-500/30 rounded px-3 py-2 focus:outline-none focus:border-amber-400 text-stone-100"/> </div> <div> <label class="block text-base font-medium mb-1 text-stone-300">個数</label> <input type="number" min="1" value="${state.itemForm.quantity}" oninput="state.itemForm.quantity = Number(this.value)" class="w-full bg-stone-900/50 border border-amber-500/30 rounded px-3 py-2 focus:outline-none focus:border-amber-400 text-stone-100"/> </div> </div> <div> <label class="block text-base font-medium mb-1 text-stone-300">売却金額</label> <input type="number" min="0" value="${state.itemForm.sellPrice}" oninput="state.itemForm.sellPrice = Number(this.value)" class="w-full bg-stone-900/50 border border-amber-500/30 rounded px-3 py-2 focus:outline-none focus:border-amber-400 text-stone-100"/> </div> <div> <label class="block text-base font-medium mb-1 text-stone-300">種類</label> <select onchange="state.itemForm.type = this.value" class="w-full bg-stone-900/50 border border-amber-500/30 rounded px-3 py-2 focus:outline-none focus:border-amber-400 text-stone-100"> <option>武器</option> <option>ポーション</option> <option>食料</option> <option>道具</option> <option>矢弾</option> <option>その他</option> </select> </div> </div> <div class="flex justify-end space-x-2 mt-6"> <button onclick="state.showItemModal = false; render();" class="btn px-4 py-2 bg-stone-700 hover:bg-stone-600 rounded text-base">キャンセル</button> <button onclick="handleAddItem()" class="btn px-4 py-2 bg-emerald-700 text-white rounded hover:bg-emerald-600 text-base">追加</button> </div> </div> </div>`; }
             if (state.showMoveModal && state.moveItemData.item) {
                  modalHTML += `
                     <div class="modal-overlay">
                         <div class="card-bg p-6 rounded-lg w-96">
-                            <h3 class="text-lg font-semibold mb-4 text-amber-200">アイテム移動</h3>
-                            <p class="mb-2 text-amber-200/80"><strong>${state.moveItemData.item.name}</strong> を誰に渡しますか？</p>
+                            <h3 class="text-xl font-semibold mb-4 text-amber-300">アイテム移動</h3>
+                            <p class="mb-2 text-stone-300 text-lg"><strong>${state.moveItemData.item.name}</strong> を誰に渡しますか？</p>
                             <div class="mb-4">
-                                <label class="block text-sm font-medium mb-1 text-amber-200/80">渡す個数 (最大: ${state.moveItemData.item.quantity})</label>
-                                <input type="number" min="1" max="${state.moveItemData.item.quantity}" value="${state.moveItemData.quantity}" oninput="state.moveItemData.quantity = this.value" class="w-full bg-stone-900/50 border border-amber-500/30 rounded px-3 py-2 focus:outline-none focus:border-amber-400">
+                                <label class="block text-base font-medium mb-1 text-stone-300">渡す個数 (最大: ${state.moveItemData.item.quantity})</label>
+                                <input type="number" min="1" max="${state.moveItemData.item.quantity}" value="${state.moveItemData.quantity}" oninput="state.moveItemData.quantity = this.value" class="w-full bg-stone-900/50 border border-amber-500/30 rounded px-3 py-2 focus:outline-none focus:border-amber-400 text-stone-100">
                             </div>
                             <div class="space-y-2 mb-6">
                                 ${state.characters.filter(c => c.id !== state.selectedCharacterId).map(character => `
-                                    <button onclick="handleMoveItem(${character.id})" class="btn w-full text-left p-3 border-amber-500/30 rounded hover:bg-black/20">
+                                    <button onclick="handleMoveItem(${character.id})" class="btn w-full text-left p-3 border-amber-500/30 rounded hover:bg-black/20 text-lg">
                                         ${character.name}
                                     </button>
                                 `).join('')}
                             </div>
                             <div class="flex justify-end">
-                                <button onclick="state.showMoveModal = false; state.moveItemData = {item: null, quantity: 1}; render();" class="btn px-4 py-2 bg-stone-700 hover:bg-stone-600 rounded">キャンセル</button>
+                                <button onclick="state.showMoveModal = false; state.moveItemData = {item: null, quantity: 1}; render();" class="btn px-4 py-2 bg-stone-700 hover:bg-stone-600 rounded text-base">キャンセル</button>
                             </div>
                         </div>
                     </div>
                 `;
             }
-            if (state.showEditCharacterModal) { const character = state.characters.find(c => c.id === state.editingCharacterId); if(character) { modalHTML += `<div class="modal-overlay"> <div class="card-bg p-6 rounded-lg w-96"> <h3 class="text-lg font-semibold mb-4 text-amber-200">${character.name} の携帯可能重量を編集</h3> <div class="space-y-4"> <div> <label class="block text-sm font-medium mb-1 text-amber-200/80">新しい携帯可能重量</label> <input type="number" min="0" value="${state.editCharacterForm.maxWeight}" oninput="state.editCharacterForm.maxWeight = this.value" class="w-full bg-stone-900/50 border border-amber-500/30 rounded px-3 py-2 focus:outline-none focus:border-amber-400" > </div> </div> <div class="flex justify-end space-x-2 mt-6"> <button onclick="state.showEditCharacterModal = false; state.editingCharacterId = null; render();" class="btn px-4 py-2 bg-stone-700 hover:bg-stone-600 rounded">キャンセル</button> <button onclick="handleUpdateCharacterWeight()" class="btn px-4 py-2 bg-sky-700 text-white rounded hover:bg-sky-600">更新</button> </div> </div> </div>`; } }
+            if (state.showEditCharacterModal) { const character = state.characters.find(c => c.id === state.editingCharacterId); if(character) { modalHTML += `<div class="modal-overlay"> <div class="card-bg p-6 rounded-lg w-96"> <h3 class="text-xl font-semibold mb-4 text-amber-300">${character.name} の携帯可能重量を編集</h3> <div class="space-y-4"> <div> <label class="block text-base font-medium mb-1 text-stone-300">新しい携帯可能重量</label> <input type="number" min="0" value="${state.editCharacterForm.maxWeight}" oninput="state.editCharacterForm.maxWeight = this.value" class="w-full bg-stone-900/50 border border-amber-500/30 rounded px-3 py-2 focus:outline-none focus:border-amber-400 text-stone-100" > </div> </div> <div class="flex justify-end space-x-2 mt-6"> <button onclick="state.showEditCharacterModal = false; state.editingCharacterId = null; render();" class="btn px-4 py-2 bg-stone-700 hover:bg-stone-600 rounded text-base">キャンセル</button> <button onclick="handleUpdateCharacterWeight()" class="btn px-4 py-2 bg-sky-700 text-white rounded hover:bg-sky-600 text-base">更新</button> </div> </div> </div>`; } }
             return modalHTML;
         }
 
