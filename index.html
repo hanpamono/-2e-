@@ -35,7 +35,7 @@
         .theme-light .btn-secondary:hover { background-color: #65a30d; }
         .theme-light .input-bg { background-color: white; border-color: #d1d5db; color: #1f2937; }
         .theme-light .input-bg:focus { border-color: #3b82f6; box-shadow: 0 0 0 1px #3b82f6; outline:none; }
-        .theme-light .selected-row { background-color: #eff6ff; } /* blue-50 */
+        .theme-light .selected-row { background-color: #eff6ff; }
 
         /* --- ダークテーマ --- */
         .theme-dark, .theme-dark html { background-color: #171717; }
@@ -55,7 +55,7 @@
         .theme-dark .btn-secondary:hover { background-color: #10b981; }
         .theme-dark .input-bg { background-color: rgba(0,0,0,0.3); border-color: rgba(212, 175, 55, 0.3); color: #e5e7eb; }
         .theme-dark .input-bg:focus { border-color: #fcd34d; outline:none; }
-        .theme-dark .selected-row { background-color: rgba(251, 191, 36, 0.15); } /* amber-400 with opacity */
+        .theme-dark .selected-row { background-color: rgba(251, 191, 36, 0.15); }
         
         /* 共通スタイル */
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.7); display: flex; align-items: center; justify-content: center; z-index: 50; backdrop-filter: blur(4px); }
@@ -92,7 +92,18 @@
         const calculateCurrentWeight = (character) => { if (!character || !character.items) return 0; let totalWeight = 0; const heaviestWeapon = character.hasWeaponCase ? character.items.filter(item => item.type === '武器').sort((a, b) => b.weight - a.weight)[0] : null; if (character.hasPotionHolder) { const totalPotionCount = character.items .filter(item => item.type === 'ポーション' && item.weight === 1) .reduce((sum, item) => sum + item.quantity, 0); totalWeight += Math.max(0, totalPotionCount - 5); } if (character.hasLunchBox) { const foodItems = character.items.filter(item => item.type === '食料'); const sortedFood = [...foodItems].sort((a, b) => b.weight - a.weight); let freeItemsBudget = 5; sortedFood.forEach(foodItem => { if (freeItemsBudget <= 0) { totalWeight += foodItem.weight * foodItem.quantity; } else { const itemsToMakeFree = Math.min(foodItem.quantity, freeItemsBudget); totalWeight += (foodItem.quantity - itemsToMakeFree) * foodItem.weight; freeItemsBudget -= itemsToMakeFree; } }); } character.items.forEach(item => { if (character.hasPotionHolder && item.type === 'ポーション' && item.weight === 1) return; if (character.hasLunchBox && item.type === '食料') return; let itemWeight = item.weight * item.quantity; if (character.hasToolPouch && item.type === '道具' && item.weight === 1) { itemWeight = (item.quantity - Math.min(item.quantity, 5)) * item.weight; } else if (character.hasQuiver && item.type === '矢弾' && item.weight === 1) { itemWeight = (item.quantity - Math.min(item.quantity, 5)) * item.weight; } else if (heaviestWeapon && item.id === heaviestWeapon.id) { itemWeight = Math.max(0, item.quantity - 1) * item.weight; } totalWeight += itemWeight; }); return totalWeight; };
         const getSelectedCharacter = () => { if (!state.characters) return null; return state.characters.find(c => c.id === state.selectedCharacterId); };
         
-        // === イベントハンドラ (変更なし) ===
+        // === イベントハンドラ ===
+        function openEditCharacterModal(characterId, event) {
+            event.stopPropagation();
+            const characterToEdit = state.characters.find(c => c.id === characterId);
+            if (!characterToEdit) return;
+
+            state.editingCharacterId = characterId;
+            state.editCharacterForm.maxWeight = characterToEdit.maxWeight;
+            state.showEditCharacterModal = true;
+            render();
+        }
+
         function handleDragStart(characterId, event) { state.draggingCharacterId = characterId; event.target.classList.add('dragging'); } function handleDragOver(event) { event.preventDefault(); const targetElement = event.target.closest('[draggable="true"]'); if (targetElement) { targetElement.classList.add('drag-over'); } } function handleDragLeave(event) { const targetElement = event.target.closest('[draggable="true"]'); if (targetElement) { targetElement.classList.remove('drag-over'); } } function handleDragEnd(event) { event.target.classList.remove('dragging'); document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over')); }
         function handleDrop(targetCharacterId, event) { event.preventDefault(); const draggedId = state.draggingCharacterId; if (draggedId === targetCharacterId) return; const draggedItem = state.characters.find(c => c.id === draggedId); const remainingItems = state.characters.filter(c => c.id !== draggedId); const targetIndex = remainingItems.findIndex(c => c.id === targetCharacterId); remainingItems.splice(targetIndex, 0, draggedItem); state.characters = remainingItems; const targetElement = event.target.closest('[draggable="true"]'); if (targetElement) targetElement.classList.remove('drag-over'); state.draggingCharacterId = null; updateFirebase(); }
         function handleSortItems(key) { if (state.sort.key === key) { state.sort.order = state.sort.order === 'asc' ? 'desc' : 'asc'; } else { state.sort.key = key; state.sort.order = 'asc'; } render(); }
