@@ -20,7 +20,7 @@
         h1, h2, h3, h4, h5, h6 { font-family: 'Cinzel Decorative', serif; letter-spacing: 0.1em; }
 
         /* --- ★ライトテーマ --- */
-        .theme-light {
+        .theme-light, .theme-light html {
             background-color: #f5f5f4; /* stone-100 */
             color: #292524; /* stone-800 */
         }
@@ -42,6 +42,10 @@
         .theme-light .input-bg:focus { border-color: #0369a1; }
 
         /* --- ★ダークテーマ --- */
+        /* ★変更点: htmlにも背景色を指定 */
+        .theme-dark, .theme-dark html {
+             background-color: #171717; /* neutral-900 */
+        }
         .theme-dark {
             background-image: url('https://images.unsplash.com/photo-1549317336-206569e8ad8f?q=80&w=2574&auto=format&fit=crop');
             background-size: cover;
@@ -73,7 +77,7 @@
         .drag-over { border-top: 2px solid #FFD700; }
     </style>
 </head>
-<body>
+<body class="bg-gray-900">
 
     <div id="app" class="min-h-screen p-2 md:p-4">
         <!-- アプリケーションの全体がここに描画されます -->
@@ -88,12 +92,8 @@
         // === SVGアイコン定義 (変更なし) ===
         const icons = { plus: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>`, trash: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`, arrowRight: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>`, edit: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`, grip: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400 cursor-move"><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>`, coin: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="8"></line></svg>`, use: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8"/><path d="M12 11v10"/><path d="m19 5-7 7-7-7"/></svg>` };
 
-        // === アプリケーションの状態管理 ===
-        let state = {
-            characters: [], sharedAssets: { money: 0 }, selectedCharacterId: null, logs: [], sort: { key: 'name', order: 'asc' },
-            theme: 'dark', // ★追加: 'light' or 'dark'
-            showCharacterModal: false, showItemModal: false, showMoveModal: false, moveItemData: { item: null, quantity: 1 }, characterForm: { name: '', maxWeight: 0 }, itemForm: { name: '', weight: 0, quantity: 1, sellPrice: 0, type: '武器' }, showEditCharacterModal: false, editingCharacterId: null, editCharacterForm: { maxWeight: 0 }, editingItemField: { id: null, field: null }, draggingCharacterId: null, editingSharedMoney: false,
-        };
+        // === アプリケーションの状態管理 (変更なし) ===
+        let state = { characters: [], sharedAssets: { money: 0 }, selectedCharacterId: null, logs: [], sort: { key: 'name', order: 'asc' }, theme: 'dark', showCharacterModal: false, showItemModal: false, showMoveModal: false, moveItemData: { item: null, quantity: 1 }, characterForm: { name: '', maxWeight: 0 }, itemForm: { name: '', weight: 0, quantity: 1, sellPrice: 0, type: '武器' }, showEditCharacterModal: false, editingCharacterId: null, editCharacterForm: { maxWeight: 0 }, editingItemField: { id: null, field: null }, draggingCharacterId: null, editingSharedMoney: false, };
 
         const appContainer = document.getElementById('app');
 
@@ -106,7 +106,7 @@
         const calculateCurrentWeight = (character) => { if (!character || !character.items) return 0; let totalWeight = 0; const heaviestWeapon = character.hasWeaponCase ? character.items.filter(item => item.type === '武器').sort((a, b) => b.weight - a.weight)[0] : null; if (character.hasPotionHolder) { const totalPotionCount = character.items .filter(item => item.type === 'ポーション' && item.weight === 1) .reduce((sum, item) => sum + item.quantity, 0); totalWeight += Math.max(0, totalPotionCount - 5); } if (character.hasLunchBox) { const foodItems = character.items.filter(item => item.type === '食料'); const sortedFood = [...foodItems].sort((a, b) => b.weight - a.weight); let freeItemsBudget = 5; sortedFood.forEach(foodItem => { if (freeItemsBudget <= 0) { totalWeight += foodItem.weight * foodItem.quantity; } else { const itemsToMakeFree = Math.min(foodItem.quantity, freeItemsBudget); totalWeight += (foodItem.quantity - itemsToMakeFree) * foodItem.weight; freeItemsBudget -= itemsToMakeFree; } }); } character.items.forEach(item => { if (character.hasPotionHolder && item.type === 'ポーション' && item.weight === 1) return; if (character.hasLunchBox && item.type === '食料') return; let itemWeight = item.weight * item.quantity; if (character.hasToolPouch && item.type === '道具' && item.weight === 1) { itemWeight = (item.quantity - Math.min(item.quantity, 5)) * item.weight; } else if (character.hasQuiver && item.type === '矢弾' && item.weight === 1) { itemWeight = (item.quantity - Math.min(item.quantity, 5)) * item.weight; } else if (heaviestWeapon && item.id === heaviestWeapon.id) { itemWeight = Math.max(0, item.quantity - 1) * item.weight; } totalWeight += itemWeight; }); return totalWeight; };
         const getSelectedCharacter = () => { if (!state.characters) return null; return state.characters.find(c => c.id === state.selectedCharacterId); };
         
-        // === イベントハンドラ ===
+        // === イベントハンドラ (変更なし) ===
         function handleDragStart(characterId, event) { state.draggingCharacterId = characterId; event.target.classList.add('dragging'); } function handleDragOver(event) { event.preventDefault(); const targetElement = event.target.closest('[draggable="true"]'); if (targetElement) { targetElement.classList.add('drag-over'); } } function handleDragLeave(event) { const targetElement = event.target.closest('[draggable="true"]'); if (targetElement) { targetElement.classList.remove('drag-over'); } } function handleDragEnd(event) { event.target.classList.remove('dragging'); document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over')); }
         function handleDrop(targetCharacterId, event) { event.preventDefault(); const draggedId = state.draggingCharacterId; if (draggedId === targetCharacterId) return; const draggedItem = state.characters.find(c => c.id === draggedId); const remainingItems = state.characters.filter(c => c.id !== draggedId); const targetIndex = remainingItems.findIndex(c => c.id === targetCharacterId); remainingItems.splice(targetIndex, 0, draggedItem); state.characters = remainingItems; const targetElement = event.target.closest('[draggable="true"]'); if (targetElement) targetElement.classList.remove('drag-over'); state.draggingCharacterId = null; updateFirebase(); }
         function handleSortItems(key) { if (state.sort.key === key) { state.sort.order = state.sort.order === 'asc' ? 'desc' : 'asc'; } else { state.sort.key = key; state.sort.order = 'asc'; } render(); }
@@ -123,22 +123,12 @@
         function handleDeleteLog(logId) { if (!window.confirm('このログを削除しますか？')) return; state.logs = state.logs.filter(log => log.id !== logId); updateFirebase(); }
         function handleClearAllLogs() { if (!window.confirm('全てのログを削除しますか？')) return; state.logs = []; updateFirebase(); }
         function handleUseItem(itemId) { const selectedCharacter = getSelectedCharacter(); const item = selectedCharacter?.items.find(i => i.id === itemId); if (!item) return; const message = `いくつ使用しますか？ (最大: ${item.quantity}個)`; const input = prompt(message, "1"); if (input === null) { return; } const amountToUse = Number(Math.floor(input)); if (isNaN(amountToUse) || amountToUse < 1) { alert("1以上の有効な数値を入力してください。"); return; } if (amountToUse > item.quantity) { alert(`使用できるのは最大 ${item.quantity}個までです。`); return; } item.quantity -= amountToUse; addLog(`${selectedCharacter.name}が「${item.name}」を ${amountToUse}個使用しました。`); if (item.quantity <= 0) { selectedCharacter.items = selectedCharacter.items.filter(i => i.id !== itemId); addLog(`「${item.name}」を使い切りました。`); } updateFirebase(); }
-        
-        /**
-         * ★新しく追加した関数
-         * テーマを切り替えます。
-         */
-        function handleToggleTheme() {
-            state.theme = state.theme === 'dark' ? 'light' : 'dark';
-            // localStorageに設定を保存
-            localStorage.setItem('arianrod-theme', state.theme);
-            // bodyのクラスを更新
-            document.body.className = `theme-${state.theme}`;
-            render();
-        }
+        function handleToggleTheme() { state.theme = state.theme === 'dark' ? 'light' : 'dark'; localStorage.setItem('arianrod-theme', state.theme); document.body.className = `theme-${state.theme}`; }
 
-        // === UI描画関数 ===
+        // === UI描画関数 (変更なし) ===
         function render() {
+            document.body.className = `theme-${state.theme}`; // ★追加: 描画のたびにテーマを適用
+
             const selectedCharacter = state.characters ? getSelectedCharacter() : null;
             const currentWeight = selectedCharacter ? calculateCurrentWeight(selectedCharacter) : 0;
             const isOverWeight = selectedCharacter ? currentWeight > selectedCharacter.maxWeight : false;
@@ -153,15 +143,14 @@
                     return 0;
                 });
             }
-
+            
             appContainer.innerHTML = `
                 <div class="max-w-7xl mx-auto">
-                    <!-- ★変更点: ヘッダーにテーマ切り替えボタンを追加 -->
                     <div class="flex justify-between items-center mb-8">
                         <h1 class="text-4xl md:text-5xl font-bold text-center text-title" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.4);">
-                            アリアンロッド2E アイテム管理
+                            アイテム管理ツール
                         </h1>
-                        <button onclick="handleToggleTheme()" class="btn bg-gray-500/20 hover:bg-gray-500/40 text-sm px-4 py-2 rounded-lg">
+                        <button onclick="handleToggleTheme()" class="btn bg-gray-500/20 hover:bg-gray-500/40 text-sm px-4 py-2 rounded-lg text-body">
                             ${state.theme === 'dark' ? 'ライトテーマへ' : 'ダークテーマへ'}
                         </button>
                     </div>
@@ -220,14 +209,14 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            ${sortedItems.map(item => `<tr class="hover-bg"><td class="border-b border-color p-3">${item.name}</td><td class="border-b border-color p-3"> ${state.editingItemField.id === item.id && state.editingItemField.field === 'type' ? `<select class="w-full input-bg border rounded px-1" onchange="handleUpdateItemField(${item.id}, 'type', this.value)" onblur="state.editingItemField = {id: null, field: null}; render();" autofocus> <option>武器</option><option>ポーション</option><option>食料</option><option>道具</option><option>矢弾</option><option>その他</option> </select>` : `<span onclick="state.editingItemField = {id: ${item.id}, field: 'type'}; render();" class="cursor-pointer hover-bg px-1 rounded">${item.type}</span>`} </td><td class="border-b border-color p-3 text-right"> ${state.editingItemField.id === item.id && state.editingItemField.field === 'weight' ? `<input type="number" value="${item.weight}" class="w-16 input-bg text-right border rounded px-1" onblur="handleUpdateItemField(${item.id}, 'weight', this.value)" onkeydown="if(event.key === 'Enter') this.blur()" autofocus onfocus="this.select()">` : `<span onclick="state.editingItemField = {id: ${item.id}, field: 'weight'}; render();" class="cursor-pointer hover-bg px-1 rounded">${item.weight}</span>`} </td><td class="border-b border-color p-3 text-right"> ${state.editingItemField.id === item.id && state.editingItemField.field === 'quantity' ? `<input type="number" value="${item.quantity}" class="w-16 input-bg text-right border rounded px-1" onblur="handleUpdateItemField(${item.id}, 'quantity', this.value)" onkeydown="if(event.key === 'Enter') this.blur()" autofocus onfocus="this.select()">` : `<span onclick="state.editingItemField = {id: ${item.id}, field: 'quantity'}; render();" class="cursor-pointer hover-bg px-1 rounded">${item.quantity}</span>`} </td><td class="border-b border-color p-3 text-right"> ${state.editingItemField.id === item.id && state.editingItemField.field === 'sellPrice' ? `<input type="number" value="${item.sellPrice}" class="w-20 input-bg text-right border rounded px-1" onblur="handleUpdateItemField(${item.id}, 'sellPrice', this.value)" onkeydown="if(event.key === 'Enter') this.blur()" autofocus onfocus="this.select()">` : `<span onclick="state.editingItemField = {id: ${item.id}, field: 'sellPrice'}; render();" class="cursor-pointer hover-bg px-1 rounded">${item.sellPrice}</span>`} </td><td class="border-b border-color p-3"><div class="flex gap-1 justify-center"><button onclick="handleUseItem(${item.id})" class="btn bg-emerald-700 hover:bg-emerald-600 text-white p-1 rounded" title="使用"> ${icons.use} </button><button onclick="handleSellItem(${item.id})" class="btn bg-amber-600 hover:bg-amber-500 text-white p-1 rounded" title="売却"> ${icons.coin} </button><button onclick='state.moveItemData = { item: ${JSON.stringify(item)}, quantity: 1 }; state.showMoveModal = true; render();' class="btn bg-sky-700 hover:bg-sky-600 text-white p-1 rounded" title="移動">${icons.arrowRight}</button><button onclick="handleDeleteItem(${item.id})" class="btn bg-red-800 hover:bg-red-700 text-white p-1 rounded" title="削除（破棄）">${icons.trash}</button></div></td></tr>`).join('')}
+                                            ${sortedItems.map(item => `<tr class="hover-bg"><td class="border-b border-color p-3">${item.name}</td><td class="border-b border-color p-3"> ${state.editingItemField.id === item.id && state.editingItemField.field === 'type' ? `<select class="w-full input-bg border rounded px-1" onchange="handleUpdateItemField(${item.id}, 'type', this.value)" onblur="state.editingItemField = {id: null, field: null}; render();" autofocus> <option>武器</option><option>ポーション</option><option>食料</option><option>道具</option><option>矢弾</option><option>その他</option> </select>` : `<span onclick="state.editingItemField = {id: ${item.id}, field: 'type'}; render();" class="cursor-pointer hover-bg px-1 rounded">${item.type}</span>`} </td><td class="border-b border-color p-3 text-right"> ${state.editingItemField.id === item.id && state.editingItemField.field === 'weight' ? `<input type="number" value="${item.weight}" class="w-16 input-bg text-right border rounded px-1" onblur="handleUpdateItemField(${item.id}, 'weight', this.value)" onkeydown="if(event.key === 'Enter') this.blur()" autofocus onfocus="this.select()">` : `<span onclick="state.editingItemField = {id: ${item.id}, field: 'weight'}; render();" class="cursor-pointer hover-bg px-1 rounded">${item.weight}</span>`} </td><td class="border-b border-color p-3 text-right"> ${state.editingItemField.id === item.id && state.editingItemField.field === 'quantity' ? `<input type="number" value="${item.quantity}" class="w-16 input-bg text-right border rounded px-1" onblur="handleUpdateItemField(${item.id}, 'quantity', this.value)" onkeydown="if(event.key === 'Enter') this.blur()" autofocus onfocus="this.select()">` : `<span onclick="state.editingItemField = {id: ${item.id}, field: 'quantity'}; render();" class="cursor-pointer hover-bg px-1 rounded">${item.quantity}</span>`} </td><td class="border-b border-color p-3 text-right"> ${state.editingItemField.id === item.id && state.editingItemField.field === 'sellPrice' ? `<input type="number" value="${item.sellPrice}" class="w-20 input-bg text-right border rounded px-1" onblur="handleUpdateItemField(${item.id}, 'sellPrice', this.value)" onkeydown="if(event.key === 'Enter') this.blur()" autofocus onfocus="this.select()">` : `<span onclick="state.editingItemField = {id: ${item.id}, field: 'sellPrice'}; render();" class="cursor-pointer hover-bg px-1 rounded">${item.sellPrice}</span>`} </td><td class="border-b border-color p-3"><div class="flex gap-1 justify-center"><button onclick="handleUseItem(${item.id})" class="btn bg-emerald-700 hover:bg-emerald-600 text-white p-1 rounded" title="使用"> ${icons.use} </button><button onclick="handleSellItem(${item.id})" class="btn bg-amber-600 hover:bg-amber-500 text-white p-1 rounded" title="売却"> ${icons.coin} </button><button onclick='state.moveItemData = { item: ${JSON.stringify(item)}, quantity: 1 }; state.showMoveModal = true; render();' class="btn btn-primary text-white p-1 rounded" title="移動">${icons.arrowRight}</button><button onclick="handleDeleteItem(${item.id})" class="btn bg-red-800 hover:bg-red-700 text-white p-1 rounded" title="削除（破棄）">${icons.trash}</button></div></td></tr>`).join('')}
                                         </tbody>
                                     </table>
                                 </div>
 
                                 <!-- モバイル用カード表示 -->
                                 <div class="md:hidden space-y-3">
-                                    ${sortedItems.map(item => `<div class="bg-black/20 border border-color rounded-lg p-3"><div class="font-bold text-xl text-body mb-2">${item.name}</div><div class="grid grid-cols-2 gap-x-4 gap-y-1 text-base text-muted"><div><span class="font-semibold text-stone-400">種類:</span> ${item.type}</div><div><span class="font-semibold text-stone-400">個数:</span> ${item.quantity}</div><div><span class="font-semibold text-stone-400">重量:</span> ${item.weight}</div><div><span class="font-semibold text-stone-400">売却額:</span> ${item.sellPrice} G</div></div><div class="mt-3 pt-3 border-t border-color flex gap-2 justify-end"><button onclick="handleUseItem(${item.id})" class="flex-1 btn bg-emerald-700 hover:bg-emerald-600 text-white px-3 py-1 text-base rounded-md flex items-center justify-center gap-1"> ${icons.use} 使用</button><button onclick="handleSellItem(${item.id})" class="flex-1 btn bg-amber-600 hover:bg-amber-500 text-white px-3 py-1 text-base rounded-md flex items-center justify-center gap-1"> ${icons.coin} 売却</button><button onclick='state.moveItemData = { item: ${JSON.stringify(item)}, quantity: 1 }; state.showMoveModal = true; render();' class="btn bg-sky-700 hover:bg-sky-600 text-white p-2 rounded-md" title="移動">${icons.arrowRight}</button><button onclick="handleDeleteItem(${item.id})" class="btn bg-red-800 hover:bg-red-700 text-white p-2 rounded-md" title="削除（破棄）">${icons.trash}</button></div></div>`).join('')}
+                                    ${sortedItems.map(item => `<div class="bg-black/20 border border-color rounded-lg p-3"><div class="font-bold text-xl text-body mb-2">${item.name}</div><div class="grid grid-cols-2 gap-x-4 gap-y-1 text-base text-muted"><div><span class="font-semibold text-stone-400">種類:</span> ${item.type}</div><div><span class="font-semibold text-stone-400">個数:</span> ${item.quantity}</div><div><span class="font-semibold text-stone-400">重量:</span> ${item.weight}</div><div><span class="font-semibold text-stone-400">売却額:</span> ${item.sellPrice} G</div></div><div class="mt-3 pt-3 border-t border-color flex gap-2 justify-end"><button onclick="handleUseItem(${item.id})" class="flex-1 btn bg-emerald-700 hover:bg-emerald-600 text-white px-3 py-1 text-base rounded-md flex items-center justify-center gap-1"> ${icons.use} 使用</button><button onclick="handleSellItem(${item.id})" class="flex-1 btn bg-amber-600 hover:bg-amber-500 text-white px-3 py-1 text-base rounded-md flex items-center justify-center gap-1"> ${icons.coin} 売却</button><button onclick='state.moveItemData = { item: ${JSON.stringify(item)}, quantity: 1 }; state.showMoveModal = true; render();' class="btn btn-primary text-white p-2 rounded-md" title="移動">${icons.arrowRight}</button><button onclick="handleDeleteItem(${item.id})" class="btn bg-red-800 hover:bg-red-700 text-white p-2 rounded-md" title="削除（破棄）">${icons.trash}</button></div></div>`).join('')}
                                 </div>
                             ` : `<div class="text-center text-muted py-12 text-lg">キャラクターを選択してください</div>`}
                         </div>
@@ -280,11 +269,8 @@
 
         // === アプリケーションの初期化 ===
         document.addEventListener('DOMContentLoaded', () => {
-            // localStorageからテーマ設定を読み込む
             const savedTheme = localStorage.getItem('arianrod-theme') || 'dark';
             state.theme = savedTheme;
-            document.body.className = `theme-${state.theme}`;
-
             setupDataListener();
         });
     </script>
